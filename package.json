@@ -58,6 +58,6 @@
     "webpack": "^4.12.0"
   },
   "devDependencies": {
-    "kill-by-port": "0.0.1"
+    "kill-by-port": "0.0.2"
   }
 }
