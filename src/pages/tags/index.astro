@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const isDev = import.meta.env.DEV;
+const posts = await getCollection('posts', ({ data }) => isDev || !data.draft);
+
+const tagCounts: Record<string, number> = {};
+posts.forEach((post) => {
+  if (post.data.keywords) {
+    post.data.keywords.split(',').forEach((tag) => {
+      const clean = tag.trim().toLowerCase();
+      if (clean) {
+        tagCounts[clean] = (tagCounts[clean] || 0) + 1;
+      }
+    });
+  }
+});
+
+const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
+---
+
+<BaseLayout title="Topics & Tags">
+  <div class="max-w-3xl mx-auto py-6">
+    <h1 class="text-3xl font-extrabold text-neutral-900 dark:text-white mb-2">Explore by Topic</h1>
+    <p class="text-neutral-600 dark:text-neutral-400 mb-8">
+      Browse all articles categorized by technology, language, and concept.
+    </p>
+
+    <div class="flex flex-wrap gap-2.5">
+      {sortedTags.map(([tag, count]) => (
+        <a
+          href={`/tags/${tag}`}
+          class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 hover:border-sky-500/40 hover:bg-sky-50/50 dark:hover:bg-sky-950/30 text-neutral-800 dark:text-neutral-200 transition-all text-sm group"
+        >
+          <span class="font-medium group-hover:text-sky-600 dark:group-hover:text-sky-400">#{tag}</span>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 font-mono">
+            {count}
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

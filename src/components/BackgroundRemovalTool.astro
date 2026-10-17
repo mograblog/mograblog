@@ -1,0 +1,255 @@
+---
+---
+
+<div id="bg-tool-card" class="not-prose my-10 p-5 sm:p-7 rounded-2xl border border-sky-500/20 bg-gradient-to-b from-sky-50/50 to-white dark:from-sky-950/20 dark:to-neutral-900/60 shadow-lg backdrop-blur">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 uppercase tracking-wider">Interactive Tool</span>
+        <h3 class="text-base sm:text-lg font-bold text-neutral-900 dark:text-white m-0">Try Live Background Removal</h3>
+      </div>
+      <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-1 mb-0">
+        Runs 100% in your browser with WebAssembly / WebGPU. No image is ever uploaded to a server.
+      </p>
+    </div>
+    <div id="gpu-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 self-start sm:self-auto flex-shrink-0">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span>Client WASM/WebGPU</span>
+    </div>
+  </div>
+
+  <!-- Drop Zone / Upload Area -->
+  <div
+    id="bg-dropzone"
+    class="relative group border-2 border-dashed border-neutral-300 dark:border-neutral-700 hover:border-sky-500 dark:hover:border-sky-400 rounded-xl p-6 sm:p-8 text-center cursor-pointer transition-all bg-white/50 dark:bg-neutral-900/30 hover:bg-sky-50/30 dark:hover:bg-sky-950/20"
+  >
+    <input type="file" id="bg-file-input" accept="image/png, image/jpeg, image/webp" class="hidden" />
+
+    <div class="flex flex-col items-center justify-center gap-2">
+      <div class="w-12 h-12 rounded-2xl bg-sky-100 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-0.5">
+          <span class="text-sky-600 dark:text-sky-400 underline decoration-sky-400/50">Click to upload</span> or drag and drop
+        </p>
+        <p class="text-xs text-neutral-400 dark:text-neutral-500 mb-0">PNG, JPG or WebP (Or try sample images below)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Sample Buttons -->
+  <div class="flex items-center gap-2 mt-3 flex-wrap">
+    <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">Or try samples:</span>
+    <button type="button" class="sample-btn px-2.5 py-1 text-xs font-medium rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:border-sky-500 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer" data-src="/images/posts/background-removal/tulip-original.jpg">
+      🌷 Tulip
+    </button>
+    <button type="button" class="sample-btn px-2.5 py-1 text-xs font-medium rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:border-sky-500 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer" data-src="/images/posts/background-removal/koala-original.jpg">
+      🐨 Koala
+    </button>
+  </div>
+
+  <!-- Processing State / Progress Bar -->
+  <div id="bg-progress-container" class="hidden mt-6 p-4 rounded-xl border border-sky-500/30 bg-sky-50/80 dark:bg-sky-950/30">
+    <div class="flex items-center justify-between text-xs font-semibold text-sky-900 dark:text-sky-300 mb-2">
+      <span id="bg-progress-status">Loading neural model (~25MB WebAssembly)...</span>
+      <span id="bg-progress-percent">0%</span>
+    </div>
+    <div class="w-full h-2 rounded-full bg-sky-200 dark:bg-sky-900/60 overflow-hidden">
+      <div id="bg-progress-bar" class="h-full bg-sky-500 rounded-full transition-all duration-300 w-0"></div>
+    </div>
+    <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-2 mb-0">First run downloads the WASM model. Subsequent runs execute instantly from browser cache.</p>
+  </div>
+
+  <!-- Results Preview Grid -->
+  <div id="bg-results" class="hidden mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-800">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Original -->
+      <div class="flex flex-col items-center">
+        <span class="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-2">Original Image</span>
+        <div class="w-full aspect-square rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+          <img id="preview-original" src="" alt="Original upload preview" class="w-full h-full object-contain" />
+        </div>
+      </div>
+
+      <!-- Processed Cutout -->
+      <div class="flex flex-col items-center">
+        <span class="text-xs font-semibold text-sky-600 dark:text-sky-400 mb-2">Transparent AI Cutout</span>
+        <div class="w-full aspect-square rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800 transparency-checkers flex items-center justify-center relative group">
+          <img id="preview-cutout" src="" alt="Transparent cutout preview" class="w-full h-full object-contain" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Download & Reset Actions -->
+    <div class="flex items-center justify-end gap-3 mt-4">
+      <button
+        type="button"
+        id="btn-reset-tool"
+        class="px-3 py-1.5 text-xs font-medium rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors cursor-pointer"
+      >
+        Clear / Try Another
+      </button>
+
+      <a
+        id="btn-download-cutout"
+        href="#"
+        download="cutout-mograblog.png"
+        class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-xl bg-sky-600 hover:bg-sky-500 text-white shadow-md active:scale-95 transition-all cursor-pointer"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        <span>Download Transparent PNG</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  let removeBackgroundFn: any = null;
+
+  async function loadLibrary() {
+    if (removeBackgroundFn) return removeBackgroundFn;
+    
+    // Dynamically load @imgly/background-removal from ESM CDN on demand
+    const imgly = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.8/+esm');
+    removeBackgroundFn = imgly.removeBackground;
+    return removeBackgroundFn;
+  }
+
+  function setupBackgroundTool() {
+    const card = document.getElementById('bg-tool-card');
+    const mount = document.getElementById('live-bg-tool-mount');
+    if (card && mount && card.parentElement !== mount) {
+      mount.appendChild(card);
+      card.parentElement?.classList.remove('hidden');
+    }
+
+    const dropzone = document.getElementById('bg-dropzone');
+    const fileInput = document.getElementById('bg-file-input') as HTMLInputElement | null;
+    const progressContainer = document.getElementById('bg-progress-container');
+    const progressStatus = document.getElementById('bg-progress-status');
+    const progressPercent = document.getElementById('bg-progress-percent');
+    const progressBar = document.getElementById('bg-progress-bar');
+    const resultsContainer = document.getElementById('bg-results');
+    const previewOriginal = document.getElementById('preview-original') as HTMLImageElement | null;
+    const previewCutout = document.getElementById('preview-cutout') as HTMLImageElement | null;
+    const btnDownload = document.getElementById('btn-download-cutout') as HTMLAnchorElement | null;
+    const btnReset = document.getElementById('btn-reset-tool');
+    const sampleBtns = document.querySelectorAll('.sample-btn');
+
+    if (!dropzone || !fileInput) return;
+
+    // Dropzone triggers
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-sky-500', 'bg-sky-50/50');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('border-sky-500', 'bg-sky-50/50');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-sky-500', 'bg-sky-50/50');
+      if (e.dataTransfer?.files.length) {
+        processImageFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files?.length) {
+        processImageFile(fileInput.files[0]);
+      }
+    });
+
+    sampleBtns.forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const src = btn.getAttribute('data-src');
+        if (src) {
+          processImageUrl(src);
+        }
+      });
+    });
+
+    btnReset?.addEventListener('click', () => {
+      resultsContainer?.classList.add('hidden');
+      progressContainer?.classList.add('hidden');
+      dropzone.classList.remove('hidden');
+      if (fileInput) fileInput.value = '';
+    });
+
+    async function processImageUrl(url: string) {
+      try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        processImageFile(blob);
+      } catch (e) {
+        console.error('Failed to load sample image:', e);
+      }
+    }
+
+    async function processImageFile(file: Blob) {
+      const originalUrl = URL.createObjectURL(file);
+      if (previewOriginal) previewOriginal.src = originalUrl;
+
+      // Show progress bar
+      progressContainer?.classList.remove('hidden');
+      resultsContainer?.classList.add('hidden');
+      dropzone?.classList.add('hidden');
+
+      if (progressStatus) progressStatus.textContent = 'Initializing in-browser model...';
+      if (progressPercent) progressPercent.textContent = '10%';
+      if (progressBar) progressBar.style.width = '10%';
+
+      try {
+        const removeBg = await loadLibrary();
+
+        if (progressStatus) progressStatus.textContent = 'Processing segmentation on device...';
+        if (progressPercent) progressPercent.textContent = '45%';
+        if (progressBar) progressBar.style.width = '45%';
+
+        const resultBlob = await removeBg(file, {
+          progress: (key: string, current: number, total: number) => {
+            if (total > 0) {
+              const pct = Math.min(95, Math.round((current / total) * 100));
+              if (progressPercent) progressPercent.textContent = `${pct}%`;
+              if (progressBar) progressBar.style.width = `${pct}%`;
+              if (progressStatus) progressStatus.textContent = `Downloading / running ${key}...`;
+            }
+          }
+        });
+
+        const cutoutUrl = URL.createObjectURL(resultBlob);
+        if (previewCutout) previewCutout.src = cutoutUrl;
+        if (btnDownload) {
+          btnDownload.href = cutoutUrl;
+          btnDownload.download = `cutout-${Date.now()}.png`;
+        }
+
+        if (progressBar) progressBar.style.width = '100%';
+        if (progressPercent) progressPercent.textContent = '100%';
+        if (progressStatus) progressStatus.textContent = 'Done!';
+
+        setTimeout(() => {
+          progressContainer?.classList.add('hidden');
+          resultsContainer?.classList.remove('hidden');
+        }, 500);
+
+      } catch (err) {
+        console.error('Background removal error:', err);
+        if (progressStatus) progressStatus.textContent = 'Failed to process image on device.';
+      }
+    }
+  }
+
+  setupBackgroundTool();
+  document.addEventListener('astro:after-swap', setupBackgroundTool);
+</script>

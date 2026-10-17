@@ -1,0 +1,314 @@
+---
+import '../../styles/global.css';
+import ThemeToggle from '../../components/ThemeToggle.astro';
+
+const title = "Web Agent Loop - Fullscreen Interactive Playground";
+const description = "Run an autonomous AI agent loop 100% inside your browser using WebGPU, Ollama, OpenAI, and MCP tool servers.";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/koalas/agent-loop-koala.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <!-- Theme Initializer: Reads and applies theme from Mograblog localStorage -->
+    <script is:inline>
+      function applyTheme() {
+        const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null;
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (saved === 'dark' || (!saved && systemPrefersDark)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+
+      applyTheme();
+
+      if (typeof window !== 'undefined') {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+          if (!localStorage.getItem('theme')) {
+            if (e.matches) {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+          }
+        });
+      }
+    </script>
+  </head>
+  <body class="bg-[#fbfbfb] dark:bg-[#09090b] text-neutral-900 dark:text-neutral-100 min-h-screen flex flex-col selection:bg-indigo-500/20 selection:text-indigo-600 dark:selection:text-indigo-300 font-sans antialiased transition-colors duration-200">
+    
+    <!-- Sleek Context-Aware Top Navigation Bar -->
+    <header class="w-full border-b border-neutral-200 dark:border-neutral-800/80 bg-white/80 dark:bg-neutral-950/80 backdrop-blur sticky top-0 z-50 px-4 sm:px-6 py-3 flex items-center justify-between transition-colors">
+      <div class="flex items-center space-x-3 sm:space-x-4">
+        <a href="/" class="flex items-center space-x-2 text-neutral-900 dark:text-white font-bold text-base hover:opacity-80 transition group">
+          <div class="w-7 h-7 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center overflow-hidden">
+            <img src="/images/logo-dark.png" alt="Mograblog" class="w-5 h-5 object-contain" />
+          </div>
+          <span class="hidden sm:inline">Mograblog</span>
+        </a>
+
+        <span class="text-neutral-300 dark:text-neutral-700 hidden sm:inline">/</span>
+
+        <!-- Dynamic Context-Aware Back Navigation -->
+        <a 
+          id="back-nav-link"
+          href="/" 
+          class="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-900/90 dark:hover:bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-sm max-w-[280px] sm:max-w-md truncate"
+        >
+          <span id="back-nav-text" class="truncate">← Mograblog Home</span>
+        </a>
+
+        <script is:inline>
+          (function() {
+            try {
+              const params = new URLSearchParams(window.location.search);
+              const fromParam = params.get('from');
+              const titleParam = params.get('title');
+              const link = document.getElementById('back-nav-link');
+              const text = document.getElementById('back-nav-text');
+
+              let targetUrl = null;
+              let targetTitle = null;
+
+              if (fromParam && fromParam.startsWith('/')) {
+                targetUrl = fromParam;
+                if (titleParam) {
+                  targetTitle = decodeURIComponent(titleParam.replace(/\+/g, ' '));
+                }
+              } else if (document.referrer) {
+                try {
+                  const refUrl = new URL(document.referrer);
+                  if (refUrl.origin === window.location.origin && /^\/\d{4}\/\d{2}\//.test(refUrl.pathname)) {
+                    targetUrl = refUrl.pathname;
+                  }
+                } catch (_) {}
+              }
+
+              if (link && text) {
+                if (targetUrl) {
+                  link.href = targetUrl;
+                  text.textContent = targetTitle ? `← Back to: ${targetTitle}` : '← Back to Article';
+                  link.title = targetTitle ? `Return to: ${targetTitle}` : 'Return to Article';
+                } else {
+                  link.href = '/';
+                  text.textContent = '← Mograblog Home';
+                  link.title = 'Return to Mograblog Home';
+                }
+              }
+            } catch (e) {
+              console.error('Nav script error:', e);
+            }
+          })();
+        </script>
+
+        <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-mono font-medium bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+          Autonomous In-Browser Runtime
+        </span>
+      </div>
+
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <a 
+          href="https://www.npmjs.com/package/@mograblog/web-agent-loop" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white border border-neutral-200 dark:border-neutral-800 transition shadow-sm"
+        >
+          <svg class="w-4 h-4 text-red-500" viewBox="0 0 780 250" fill="currentColor"><path d="M240,250h100v-50h100V0H240V250z M340,50h50v100h-50V50z M480,0v200h100V50h50v150h50V50h50v150h50V0H480z M0,200h100V50h50v150h50V0H0V200z"/></svg>
+          <span class="hidden sm:inline">@mograblog/web-agent-loop</span>
+          <span class="sm:hidden">npm</span>
+        </a>
+
+        <div class="border-l border-neutral-200 dark:border-neutral-800 pl-2 sm:pl-3 flex items-center">
+          <ThemeToggle />
+        </div>
+      </div>
+    </header>
+
+    <!-- Full-Width High-Performance Workspace Area -->
+    <main class="flex-1 w-full max-w-[1920px] mx-auto p-2 sm:p-4 lg:p-5 flex flex-col">
+      <div class="w-full flex-1 flex flex-col">
+        <web-agent-demo mode="webgpu" class="w-full flex-1 block"></web-agent-demo>
+      </div>
+    </main>
+
+    <script>
+      import '@mograblog/web-agent-loop/demo';
+    </script>
+
+    <style is:global>
+      /* Light mode theme styling for web-agent-demo custom element */
+      html:not(.dark) .web-agent-demo-root {
+        background-color: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        color: #0f172a !important;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03) !important;
+      }
+
+      html:not(.dark) .web-agent-demo-root header {
+        background-color: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+      }
+
+      html:not(.dark) .web-agent-demo-root header h2 span:first-child {
+        color: #0f172a !important;
+      }
+
+      /* Card containers */
+      html:not(.dark) .web-agent-demo-root .bg-neutral-900\/70,
+      html:not(.dark) .web-agent-demo-root .bg-neutral-900\/60 {
+        background-color: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+      }
+
+      /* Nested panels / boxes */
+      html:not(.dark) .web-agent-demo-root .bg-neutral-950,
+      html:not(.dark) .web-agent-demo-root .bg-neutral-950\/60 {
+        background-color: #ffffff !important;
+        border-color: #e2e8f0 !important;
+      }
+
+      /* Text colors */
+      html:not(.dark) .web-agent-demo-root .text-white,
+      html:not(.dark) .web-agent-demo-root .text-neutral-100,
+      html:not(.dark) .web-agent-demo-root .text-neutral-200,
+      html:not(.dark) .web-agent-demo-root .text-neutral-300 {
+        color: #1e293b !important;
+      }
+
+      html:not(.dark) .web-agent-demo-root .text-neutral-400,
+      html:not(.dark) .web-agent-demo-root .text-neutral-500 {
+        color: #64748b !important;
+      }
+
+      /* Borders */
+      html:not(.dark) .web-agent-demo-root .border-neutral-800,
+      html:not(.dark) .web-agent-demo-root .border-neutral-800\/80,
+      html:not(.dark) .web-agent-demo-root .border-neutral-800\/90 {
+        border-color: #e2e8f0 !important;
+      }
+
+      /* Form controls: inputs, selects, textareas */
+      html:not(.dark) .web-agent-demo-root input,
+      html:not(.dark) .web-agent-demo-root select,
+      html:not(.dark) .web-agent-demo-root textarea {
+        background-color: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+      }
+
+      html:not(.dark) .web-agent-demo-root input::placeholder,
+      html:not(.dark) .web-agent-demo-root textarea::placeholder {
+        color: #94a3b8 !important;
+      }
+
+      /* Engine selector tab bar container */
+      html:not(.dark) .web-agent-demo-root .grid.grid-cols-3.bg-neutral-950 {
+        background-color: #f1f5f9 !important;
+        border-color: #e2e8f0 !important;
+      }
+
+      /* Engine tab unselected */
+      html:not(.dark) .web-agent-demo-root .engine-tab:not(.bg-sky-500\/20) {
+        color: #64748b !important;
+      }
+      html:not(.dark) .web-agent-demo-root .engine-tab:not(.bg-sky-500\/20):hover {
+        color: #0f172a !important;
+        background-color: #e2e8f0 !important;
+      }
+
+      /* Engine tab selected */
+      html:not(.dark) .web-agent-demo-root .engine-tab.bg-sky-500\/20 {
+        background-color: #ffffff !important;
+        color: #0284c7 !important;
+        border-color: #bae6fd !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+      }
+
+      /* MCP tabs container & tabs */
+      html:not(.dark) .web-agent-demo-root .grid.grid-cols-4.bg-neutral-950 {
+        background-color: #f1f5f9 !important;
+        border-color: #e2e8f0 !important;
+      }
+
+      html:not(.dark) .web-agent-demo-root #mcp-config-box button:not(.bg-sky-500\/20):not(#btn-connect-mcp):not(#btn-disconnect-mcp) {
+        color: #64748b !important;
+      }
+      html:not(.dark) .web-agent-demo-root #mcp-config-box button:not(.bg-sky-500\/20):not(#btn-connect-mcp):not(#btn-disconnect-mcp):hover {
+        color: #0f172a !important;
+        background-color: #e2e8f0 !important;
+      }
+      html:not(.dark) .web-agent-demo-root #mcp-config-box button.bg-sky-500\/20 {
+        background-color: #ffffff !important;
+        color: #0284c7 !important;
+        border-color: #bae6fd !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+      }
+
+      /* Quick action chips */
+      html:not(.dark) .web-agent-demo-root .quick-chip.bg-neutral-950 {
+        background-color: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        color: #475569 !important;
+      }
+      html:not(.dark) .web-agent-demo-root .quick-chip.bg-neutral-950:hover {
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+        background-color: #f8fafc !important;
+      }
+      html:not(.dark) .web-agent-demo-root #chip-bridge-fix {
+        background-color: #ecfdf5 !important;
+        border-color: #a7f3d0 !important;
+        color: #065f46 !important;
+      }
+
+      /* Top View tab switcher (Canvas View / Dashboard View) */
+      html:not(.dark) .web-agent-demo-root #view-tab-canvas.bg-neutral-800,
+      html:not(.dark) .web-agent-demo-root #view-tab-dashboard.bg-neutral-800 {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+      }
+
+      /* Canvas container & canvas styling */
+      html:not(.dark) .web-agent-demo-root #container-canvas {
+        background-color: #f8fafc !important;
+      }
+      html:not(.dark) .web-agent-demo-root #agent-canvas {
+        background-color: #ffffff !important;
+        border-color: #cbd5e1 !important;
+      }
+
+      /* Step counter and badge pills */
+      html:not(.dark) .web-agent-demo-root .bg-neutral-800 {
+        background-color: #e2e8f0 !important;
+        color: #475569 !important;
+      }
+      html:not(.dark) .web-agent-demo-root #loop-status {
+        background-color: #e2e8f0 !important;
+        color: #475569 !important;
+      }
+      html:not(.dark) .web-agent-demo-root #hw-header-pill {
+        background-color: #f1f5f9 !important;
+        border-color: #e2e8f0 !important;
+        color: #475569 !important;
+      }
+    </style>
+  </body>
+</html>
+

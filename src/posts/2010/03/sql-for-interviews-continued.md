@@ -4,6 +4,8 @@ published: 2010-03-11T23:06:00.000-08:00
 keywords: mysql
 description: some questions you should know in mysql before an interview
 layout: post.pug
+cover: /style/images/memes/buy-3-get-2-sale.jpg
+coverTitle: Design Flaws - Buy 3 Get 2 Logic Fail
 ---
 
 In a [previous entry](http://mograblog.blogspot.com/2010/03/basic-things-you-should-know-about-sqls.html) I explained how I always get asked the same SQL questions in interviews. Lo and behold, I am asked the very same questions in an interview I had just the other day.

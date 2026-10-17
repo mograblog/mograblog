@@ -2,6 +2,8 @@
 title: The Many Ways Of Running Typescript 
 published: 2016-07-29T22:30:00.001-07:00
 layout: post.pug
+cover: /style/images/memes/starbucks-van-sliding-door.jpg
+coverTitle: Design Flaws - Sliding Door Surprise
 keywords: typescript, javascript
 description: Lets see how we can run typescript on node, browser and protractor  
 ---

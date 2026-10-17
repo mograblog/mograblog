@@ -969,3 +969,96 @@ This gives you a complete story:
 - Understand the broader problem (deployment is hard)
 - Evaluate if the solution worked (reflection)
 
+---
+
+## 7. Security Deep-Dive: The Silent Threat on Localhost (Browser Port Scanning & Local AI Vulnerabilities)
+
+### Concept & Hook
+Every developer assumes `http://localhost` is private and safe from the public internet. It's not. 
+
+Any random website you open in your browser tab can silently execute JavaScript that probes your local machine's ports (`fetch('http://localhost:11434')`), discovers what software you are running, and potentially executes code or extracts data.
+
+### Planned Interactive Demo in the Blog Post
+- **Live In-Browser Port Scanner Widget:**
+  - When the reader loads the blog post, an interactive widget pings common developer ports (`11434` Ollama, `3000` React/Next.js, `8000` Python/FastAPI, `8080`, `5173` Vite, `27017` Mongo).
+  - Uses timing differences (fetch response vs. connection refused timeout) to show the reader: *"Here are the local developer services running on your machine right now that this webpage can detect."*
+
+### Key Topics & Analysis
+1. **How Localhost Scanning Works in the Browser:**
+   - Why the browser's security model allows outgoing requests to `127.0.0.1`.
+   - Timing attacks: distinguishing open ports from closed ports via DOM events and fetch error latencies.
+2. **The Case Study: Ollama & "Probllama" (CVE-2024-37032):**
+   - How Ollama initially ran without authentication on port 11434.
+   - How security researchers showed malicious websites could trigger remote model pulls and path traversal.
+   - How Ollama patched it with strict `Origin` header checking (`OLLAMA_ORIGINS`).
+3. **The Dangers for Local AI & Agent Bridges:**
+   - The difference between inference (text generation) and execution (terminal / filesystem bridges).
+   - Why raw `exec()` bridges without authentication represent instant Remote Code Execution (RCE) vulnerabilities.
+4. **How to Protect Local Developer Tools:**
+   - **Session Bearer Tokens:** Why generating a random token on boot (`tk_...`) makes drive-by web requests impossible.
+   - **Binding to `127.0.0.1` vs `0.0.0.0`:** Preventing coffee shop Wi-Fi interception.
+   - **Strict CORS & Origin Verification:** Rejecting unexpected web origins.
+
+---
+
+## 8. The Honest Truth About npm Trusted Publishing (OIDC): The Promise, The Friction, and The "Chicken-and-Egg" Paradox
+
+### Concept & Hook
+Everyone says: *"Stop using long-lived npm API tokens in CI/CD! Use OIDC Trusted Publishing with provenance!"*
+And they are right: OIDC solves one of the worst security headaches in modern DevOps—no more managing, rotating, or leaking static secret tokens in GitHub Actions repository secrets.
+
+But nobody talks about the actual friction, confusing error messages, and Catch-22 paradoxes you hit when you actually try to set it up.
+
+### Key Topics & Real-World Friction
+1. **The "Chicken-and-Egg" Bootstrap Problem:**
+   - You want to configure Trusted Publishing for your new package repository.
+   - But on npm, you **cannot** configure Trusted Publishing for a package that does not exist yet.
+   - To create the package, you **must publish version 0.1.0 first**.
+   - To publish version 0.1.0, you are forced right back into generating a classic API key!
+2. **The 2FA Paradox & Confusing UI Errors:**
+   - With mandatory 2FA on npm, normal automation tokens fail with cryptic errors unless you tick *"Bypass two-factor authentication (2FA)"*.
+   - When you tick that box, npm displays a bright red warning: *"There are security risks with this option. For automation or CI/CD uses, please use Trusted Publishing instead."*
+   - The circular loop: npm shames you for using an automation token and tells you to use Trusted Publishing, while blocking you from using Trusted Publishing until you use an automation token!
+3. **The Artifact & Tagging Limitations:**
+   - OIDC is strictly scoped to publishing new version tarballs.
+   - What happens when you want to promote a build, add a dist-tag (`npm dist-tag add <pkg>@1.0.0 beta`), or modify package access/ownership? OIDC doesn't handle these ad-hoc admin actions—you still need personal CLI or token auth.
+4. **The "Staged Publishing" Guilt-Trip ("Why is `npm publish` Not Recommended?"):**
+   - When setting up the Trusted Publisher, npm shows a checkbox for *'Allow npm publish'* with a warning: *"Not recommended. For stronger security, leave unchecked to allow staged publishing only."*
+   - What is staged publishing? It uploads releases into a holding queue (`npm stage publish`) requiring a maintainer to log in and approve every release with 2FA.
+   - The reality check: It completely defeats the purpose of hands-off, automated CI/CD! You have to check the box if you want your GitHub Actions workflow to release automatically without pausing for human intervention.
+5. **Why It's Still Worth It (The Holy Grail):**
+   - Once version 0.1.0 is bootstrapped and the token is immediately destroyed, GitHub Actions never needs a secret token again.
+   - Cryptographically verified SLSA provenance: readers and downstream consumers can trace the exact GitHub Actions commit and workflow run that built the published artifact.
+6. **The Clean Step-by-Step Playbook:**
+   - Step 1: Bootstrap v0.1.0 with an ephemeral, single-use automation token.
+   - Step 2: Instantly delete the token on npm.
+   - Step 3: Link GitHub repository under package settings → Publishing access → Add Trusted Publisher (and check *'Allow npm publish'*).
+   - Step 4: Add `permissions: { id-token: write, contents: read }` in `.github/workflows/publish.yml`.
+   - Step 5: Pure zero-secret CI/CD forever.
+
+---
+
+## 9. Hardware Detection in Pure JavaScript: Safely Probing GPU VRAM & Shaders for In-Browser AI (Without Crashing the Tab)
+
+### Concept & Hook
+When running client-side AI models (like WebLLM with Hermes 3 8B or Llama 3.2 3B), allocating 4.5 GB of GPU buffers on an underpowered machine or integrated Intel GPU will instantly crash the browser tab ("Aw, Snap! Out of Memory"). 
+
+How can a client-side JavaScript application inspect the user's real GPU capabilities, available buffer sizes, and storage quota *before* downloading gigabytes of model weights, all while respecting browser privacy sandboxing?
+
+### Key Topics & Techniques
+1. **The Math of In-Browser VRAM:**
+   - 4-bit quantization (`q4f16_1`): 8B parameters $\approx$ 4.0 - 4.5 GB VRAM + 1 GB KV cache.
+   - Why Apple Silicon unified memory (M1-M4) excels at this vs. discrete GPUs vs. integrated chips.
+2. **Unmasking the Real GPU Name (Without Native Plugins):**
+   - Querying the WebGL debug renderer extension (`WEBGL_debug_renderer_info`).
+   - Extracting unmasked strings (`UNMASKED_RENDERER_WEBGL`) like `"Apple M3 Pro"`, `"Apple M2 Max"`, or `"NVIDIA GeForce RTX 4080"`.
+3. **Inspecting WebGPU Buffer Limits:**
+   - Querying `adapter.limits.maxBufferSize` and `maxStorageBufferBindingSize`.
+   - Distinguishing desktop GPUs (1024MB - 2048MB per buffer) from mobile/entry-level chips (256MB limit).
+4. **Storage Quota & Persistent Caching:**
+   - Using `navigator.storage.estimate()` to verify ≥10 GB free quota in the Cache API / IndexedDB before initiating weight downloads.
+5. **A Graceful Degradation & Tiering Matrix:**
+   - **Tier 3 (High):** Apple M Pro/Max or RTX GPU (>1GB buffer) $\to$ Hermes 3 8B (native tool calling).
+   - **Tier 2 (Mid):** Apple M Base or Mid GPU (512MB buffer) $\to$ Llama 3.2 1B-3B.
+   - **Tier 1 (Light):** Mobile / entry-level GPU $\to$ SmolLM2 360M.
+   - **Tier 0 (Fallback):** WebGPU unavailable $\to$ Cloud API or local Ollama proxy.

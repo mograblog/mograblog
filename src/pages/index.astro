@@ -1,0 +1,137 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import HomeLiveReading from '../components/HomeLiveReading.astro';
+
+const isDev = import.meta.env.DEV;
+const posts = await getCollection('posts', ({ data }) => isDev || !data.draft);
+
+// Sort posts by publication date descending
+const sortedPosts = posts.sort((a, b) => {
+  const dateA = a.data.published ? new Date(a.data.published).getTime() : 0;
+  const dateB = b.data.published ? new Date(b.data.published).getTime() : 0;
+  return dateB - dateA;
+});
+
+// Posts with custom cover artwork
+const postsWithCovers = sortedPosts.filter((p) => Boolean(p.data.cover));
+const recentPosts = sortedPosts;
+
+// Extract popular tags
+const allTags = Array.from(
+  new Set(
+    sortedPosts
+      .flatMap((p) => (p.data.keywords ? p.data.keywords.split(',').map((k) => k.trim()) : []))
+      .filter(Boolean)
+  )
+).slice(0, 10);
+---
+
+<BaseLayout title="Mograblog - Let's make it work!">
+  <!-- Hero Section -->
+  <section class="py-6 sm:py-10 mb-10 border-b border-neutral-200 dark:border-neutral-800">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div class="max-w-2xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800 mb-4">
+          <span class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
+          Engineering & Architecture Blog
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-tight">
+          Let's make it work!
+        </h1>
+        <p class="mt-3 text-base sm:text-lg text-neutral-600 dark:text-neutral-300 leading-relaxed">
+          Welcome to Guy Mograbi's blog. Practical walkthroughs, deep dives into cloud architecture, developer tooling, web engineering, and software design.
+        </p>
+      </div>
+
+      <!-- Mograblog Emblem -->
+      <div class="flex flex-col items-center sm:items-end flex-shrink-0">
+        <div class="w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center">
+          <img
+            src="/images/logo-light.png"
+            alt="Mograblog Emblem"
+            class="w-full h-full object-contain dark:hidden hover:scale-105 transition-transform duration-300"
+          />
+          <img
+            src="/images/logo-dark.png"
+            alt="Mograblog Emblem"
+            class="w-full h-full object-contain hidden dark:block hover:scale-105 transition-transform duration-300"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Popular Topics bar -->
+    {allTags.length > 0 && (
+      <div class="mt-8 flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mr-1">Popular Topics:</span>
+        {allTags.map((tag) => (
+          <a
+            href={`/tags/${tag.toLowerCase()}`}
+            class="px-3 py-1 text-xs font-medium rounded-lg bg-neutral-100 dark:bg-neutral-800/80 text-neutral-700 dark:text-neutral-300 hover:bg-sky-50 dark:hover:bg-sky-950/50 hover:text-sky-600 dark:hover:text-sky-400 border border-transparent hover:border-sky-300 dark:hover:border-sky-800 transition-all"
+          >
+            #{tag}
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+
+  <!-- Real-time Reader Activity -->
+  <HomeLiveReading />
+
+  <!-- Featured Illustrated Articles (With Cover Art) -->
+  {postsWithCovers.length > 0 && (
+    <section class="mb-14">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+            Featured Stories
+          </h2>
+          <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+            Deep-dive articles with visual architecture and diagrams
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {postsWithCovers.slice(0, 4).map((post, index) => (
+          <PostCard
+            title={post.data.title}
+            published={post.data.published}
+            description={post.data.description}
+            keywords={post.data.keywords}
+            cover={post.data.cover}
+            url={`/${post.id.replace(/\.md$/, '')}`}
+            featured={index === 0}
+            draft={post.data.draft}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- All Articles Grid -->
+  <section>
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+        All Articles ({recentPosts.length})
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {recentPosts.map((post) => (
+        <PostCard
+          title={post.data.title}
+          published={post.data.published}
+          description={post.data.description}
+          keywords={post.data.keywords}
+          cover={post.data.cover}
+          url={`/${post.id.replace(/\.md$/, '')}`}
+          draft={post.data.draft}
+        />
+      ))}
+    </div>
+  </section>
+</BaseLayout>

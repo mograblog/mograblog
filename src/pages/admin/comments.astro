@@ -1,0 +1,548 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Comments Moderation Dashboard">
+  <div class="max-w-4xl mx-auto py-4">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-neutral-200 dark:border-neutral-800">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 flex items-center justify-center flex-shrink-0">
+          <img src="/images/logo-light.png" alt="Mograblog" class="w-full h-full object-contain dark:hidden" />
+          <img src="/images/logo-dark.png" alt="Mograblog" class="w-full h-full object-contain hidden dark:block" />
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+            Comment Moderation
+          </h1>
+          <p class="text-xs text-neutral-500 dark:text-neutral-400">
+            Review, moderate, and manage comments across the blog
+          </p>
+        </div>
+      </div>
+
+      <div id="admin-session-badge" class="hidden items-center gap-2">
+        <span id="admin-badge-label" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+          ● Admin Authenticated
+        </span>
+        <button
+          id="btn-admin-lock"
+          type="button"
+          class="px-2.5 py-1 text-xs text-neutral-500 hover:text-red-500 dark:text-neutral-400 transition-colors"
+        >
+          Sign Out / Lock
+        </button>
+      </div>
+    </div>
+
+    <!-- 1. Clerk Admin Sign-In Screen -->
+    <div id="auth-lock-card" class="p-8 max-w-md mx-auto my-12 rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/80 shadow-xl text-center space-y-6">
+      <div class="w-12 h-12 mx-auto rounded-2xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 flex items-center justify-center text-sky-600 dark:text-sky-400">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-neutral-900 dark:text-white mb-1">Moderator Access</h2>
+        <p id="auth-lock-msg" class="text-xs text-neutral-500 dark:text-neutral-400">Sign in with your authorized admin account to unlock the moderation dashboard</p>
+      </div>
+
+      <!-- Clerk embedded mount container -->
+      <div id="clerk-signin-mount" class="flex justify-center w-full"></div>
+
+      <button
+        id="btn-admin-google-login"
+        type="button"
+        class="w-full py-2.5 px-4 rounded-xl text-sm font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-sm shadow-sky-600/20 active:scale-98 transition-all flex items-center justify-center gap-2"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+        <span>Sign In</span>
+      </button>
+    </div>
+
+    <!-- 2. Main Dashboard (Visible when authenticated) -->
+    <div id="dashboard-content" class="hidden space-y-6">
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/60">
+          <div class="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Total Comments</div>
+          <div id="stat-total" class="text-2xl font-bold text-neutral-900 dark:text-white mt-1">0</div>
+        </div>
+        <div class="p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/60">
+          <div class="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Inline Notes</div>
+          <div id="stat-inline" class="text-2xl font-bold text-sky-600 dark:text-sky-400 mt-1">0</div>
+        </div>
+        <div class="p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/60">
+          <div class="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Thread Replies</div>
+          <div id="stat-replies" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">0</div>
+        </div>
+        <div class="p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/60">
+          <div class="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Articles Discussed</div>
+          <div id="stat-articles" class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
+        </div>
+      </div>
+
+      <!-- Tab Switcher & Search/Filters -->
+      <div class="flex flex-col sm:flex-row gap-3 items-center justify-between pb-2 border-b border-neutral-200 dark:border-neutral-800">
+        <!-- Navigation Tabs -->
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            id="tab-btn-comments"
+            type="button"
+            class="px-3.5 py-2 text-xs font-bold rounded-xl bg-sky-600 text-white shadow-sm shadow-sky-600/20 transition-all flex items-center gap-1.5"
+          >
+            <span>💬 Comments</span>
+            <span id="badge-comments-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20">0</span>
+          </button>
+          <button
+            id="tab-btn-feedback"
+            type="button"
+            class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all flex items-center gap-1.5"
+          >
+            <span>📝 Feedback</span>
+            <span id="badge-feedback-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-neutral-200 dark:bg-neutral-700">0</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <div class="relative w-full sm:w-64">
+            <input
+              type="text"
+              id="search-comments-input"
+              placeholder="Search author, keyword, or slug..."
+              class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30"
+            />
+            <svg class="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <button
+            id="btn-refresh"
+            type="button"
+            class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 transition-colors flex items-center gap-1.5 flex-shrink-0"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Comments Stream Container -->
+      <div id="admin-comments-container" class="space-y-3">
+        <div class="py-12 text-center text-sm text-neutral-400 animate-pulse">
+          Loading comments...
+        </div>
+      </div>
+
+      <!-- Feedback Stream Container -->
+      <div id="admin-feedback-container" class="hidden space-y-3">
+        <div class="py-12 text-center text-sm text-neutral-400 animate-pulse">
+          Loading feedback...
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { initClerk, getClerkUser, openSignInModal, signOutUser, onAuthChange, getClerkToken } from '../../lib/clerk';
+
+  let commentsData: any[] = [];
+  let feedbacksData: any[] = [];
+  let currentTab: 'comments' | 'feedback' = 'comments';
+
+  const authCard = document.getElementById('auth-lock-card');
+  const authMsg = document.getElementById('auth-lock-msg');
+  const dashboard = document.getElementById('dashboard-content');
+  const sessionBadge = document.getElementById('admin-session-badge');
+  const lockBtn = document.getElementById('btn-admin-lock');
+  const refreshBtn = document.getElementById('btn-refresh');
+  const searchInput = document.getElementById('search-comments-input') as HTMLInputElement;
+  const commentsContainer = document.getElementById('admin-comments-container');
+  const feedbackContainer = document.getElementById('admin-feedback-container');
+  const tabBtnComments = document.getElementById('tab-btn-comments');
+  const tabBtnFeedback = document.getElementById('tab-btn-feedback');
+  const badgeComments = document.getElementById('badge-comments-count');
+  const badgeFeedback = document.getElementById('badge-feedback-count');
+  const btnGoogleLogin = document.getElementById('btn-admin-google-login');
+
+  btnGoogleLogin?.addEventListener('click', () => {
+    openSignInModal();
+  });
+
+  function switchTab(tab: 'comments' | 'feedback') {
+    currentTab = tab;
+    if (tab === 'comments') {
+      commentsContainer?.classList.remove('hidden');
+      feedbackContainer?.classList.add('hidden');
+      tabBtnComments?.classList.add('bg-sky-600', 'text-white', 'shadow-sky-600/20');
+      tabBtnComments?.classList.remove('bg-neutral-100', 'dark:bg-neutral-800', 'text-neutral-600', 'dark:text-neutral-300');
+      tabBtnFeedback?.classList.remove('bg-sky-600', 'text-white', 'shadow-sky-600/20');
+      tabBtnFeedback?.classList.add('bg-neutral-100', 'dark:bg-neutral-800', 'text-neutral-600', 'dark:text-neutral-300');
+    } else {
+      commentsContainer?.classList.add('hidden');
+      feedbackContainer?.classList.remove('hidden');
+      tabBtnFeedback?.classList.add('bg-sky-600', 'text-white', 'shadow-sky-600/20');
+      tabBtnFeedback?.classList.remove('bg-neutral-100', 'dark:bg-neutral-800', 'text-neutral-600', 'dark:text-neutral-300');
+      tabBtnComments?.classList.remove('bg-sky-600', 'text-white', 'shadow-sky-600/20');
+      tabBtnComments?.classList.add('bg-neutral-100', 'dark:bg-neutral-800', 'text-neutral-600', 'dark:text-neutral-300');
+    }
+    filterAndRender();
+  }
+
+  tabBtnComments?.addEventListener('click', () => switchTab('comments'));
+  tabBtnFeedback?.addEventListener('click', () => switchTab('feedback'));
+
+  async function checkAdminAndLoad() {
+    try {
+      const clerk = await initClerk();
+      const user = getClerkUser(clerk);
+      handleUserAuthState(user);
+    } catch (e) {
+      console.warn('Clerk init error:', e);
+      showAuthScreen('Sign in with your authorized admin account to unlock the moderation dashboard');
+    }
+  }
+
+  async function handleUserAuthState(user: any) {
+    const mountEl = document.getElementById('clerk-signin-mount');
+    if (user && user.isAdmin) {
+      if (mountEl) mountEl.innerHTML = '';
+      showDashboard();
+      fetchComments();
+    } else if (user) {
+      if (mountEl) mountEl.innerHTML = '';
+      btnGoogleLogin?.classList.remove('hidden');
+      showAuthScreen(`Signed in as <strong>${escapeHtml(user.email)}</strong>.<br/><span class="text-rose-500 font-semibold mt-2 block">Access restricted to authorized administrators.</span>`);
+    } else {
+      showAuthScreen(`Sign in with your authorized admin account to unlock the moderation dashboard`);
+      try {
+        const clerk = await initClerk();
+        if (mountEl && clerk && typeof clerk.mountSignIn === 'function' && !mountEl.hasChildNodes()) {
+          clerk.mountSignIn(mountEl, {
+            fallbackRedirectUrl: window.location.href,
+            signUpFallbackRedirectUrl: window.location.href,
+            afterSignInUrl: window.location.href,
+            afterSignUpUrl: window.location.href,
+          });
+          btnGoogleLogin?.classList.add('hidden');
+        }
+      } catch (e) {
+        console.warn('Could not mount embedded sign-in widget:', e);
+      }
+    }
+  }
+
+  onAuthChange((user) => {
+    handleUserAuthState(user);
+  });
+
+  async function fetchComments() {
+    const token = await getClerkToken();
+    if (!token) {
+      showAuthScreen(`Please sign in with your authorized admin account.`);
+      return;
+    }
+
+    if (commentsContainer) {
+      commentsContainer.innerHTML = '<div class="py-12 text-center text-sm text-neutral-400 animate-pulse">Fetching moderation data...</div>';
+    }
+
+    try {
+      const res = await fetch('/api/admin/comments', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        showAuthScreen(`Unauthorized access. Please sign in with an authorized admin account.`);
+        return;
+      }
+
+      if (!res.ok) throw new Error('Failed to load comments');
+      const data = await res.json();
+      commentsData = data.comments || [];
+      feedbacksData = data.feedbacks || [];
+
+      if (badgeComments) badgeComments.textContent = String(commentsData.length);
+      if (badgeFeedback) badgeFeedback.textContent = String(feedbacksData.length);
+
+      showDashboard();
+      updateStats();
+      filterAndRender();
+    } catch (err: any) {
+      if (commentsContainer) {
+        commentsContainer.innerHTML = `<div class="p-6 text-center text-sm text-red-500 border border-dashed border-red-300 dark:border-red-900/50 rounded-2xl">${err.message}</div>`;
+      }
+    }
+  }
+
+  function updateStats() {
+    const statTotal = document.getElementById('stat-total');
+    const statInline = document.getElementById('stat-inline');
+    const statReplies = document.getElementById('stat-replies');
+    const statArticles = document.getElementById('stat-articles');
+
+    if (statTotal) statTotal.textContent = String(commentsData.length);
+    if (statInline) statInline.textContent = String(commentsData.filter(c => Boolean(c.target_paragraph)).length);
+    if (statReplies) statReplies.textContent = String(commentsData.filter(c => Boolean(c.parent_id)).length);
+    if (statArticles) {
+      const uniqueSlugs = new Set(commentsData.map(c => c.post_slug));
+      statArticles.textContent = String(uniqueSlugs.size);
+    }
+  }
+
+  function renderFeedbacksList(list: any[]) {
+    if (!feedbackContainer) return;
+    if (list.length === 0) {
+      feedbackContainer.innerHTML = `
+        <div class="p-12 text-center text-sm text-neutral-400 border border-dashed border-neutral-300 dark:border-neutral-800 rounded-2xl">
+          No feedback entries received yet.
+        </div>
+      `;
+      return;
+    }
+
+    feedbackContainer.innerHTML = list.map(f => {
+      const formattedDate = new Date(f.created_at).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      const tags = (f.quick_feedback || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+
+      return `
+        <div class="p-4 sm:p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/60 shadow-sm transition-all hover:border-neutral-300 dark:hover:border-neutral-700">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                📝
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-sm font-semibold text-neutral-900 dark:text-white">${escapeHtml(f.name || 'Anonymous Reader')}</span>
+                  ${f.email ? `<span class="text-[11px] px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-mono">${escapeHtml(f.email)}</span>` : ''}
+                </div>
+                <div class="text-[11px] text-neutral-400">${formattedDate}</div>
+              </div>
+            </div>
+
+            <!-- Post link badge -->
+            <a
+              href="/${escapeHtml(f.post_slug)}"
+              target="_blank"
+              class="inline-flex items-center gap-1 text-[11px] font-medium text-sky-600 dark:text-sky-400 hover:underline bg-sky-50 dark:bg-sky-950/50 px-2.5 py-1 rounded-lg border border-sky-100 dark:border-sky-900 self-start sm:self-auto"
+            >
+              <span>${escapeHtml(f.post_title || f.post_slug)}</span>
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+          </div>
+
+          <!-- Quick Feedback Tags -->
+          ${tags.length > 0 ? `
+            <div class="flex flex-wrap gap-1.5 mb-3">
+              ${tags.map((t: string) => `
+                <span class="px-2 py-0.5 rounded-lg text-xs font-medium bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
+                  ✓ ${escapeHtml(t)}
+                </span>
+              `).join('')}
+            </div>
+          ` : ''}
+
+          <!-- Custom Message -->
+          ${f.custom_message ? `
+            <div class="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-line pl-1 bg-neutral-50 dark:bg-neutral-950/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800">
+              ${escapeHtml(f.custom_message)}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderCommentsList(list: any[]) {
+    if (!commentsContainer) return;
+    if (list.length === 0) {
+      commentsContainer.innerHTML = `
+        <div class="p-12 text-center text-sm text-neutral-400 border border-dashed border-neutral-300 dark:border-neutral-800 rounded-2xl">
+          No comments match your search criteria.
+        </div>
+      `;
+      return;
+    }
+
+    commentsContainer.innerHTML = list.map(c => {
+      const formattedDate = new Date(c.created_at).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      return `
+        <div class="p-4 sm:p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/60 shadow-sm transition-all hover:border-neutral-300 dark:hover:border-neutral-700" data-id="${c.id}">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-sm overflow-hidden flex-shrink-0">
+                ${c.author_avatar 
+                  ? `<img src="${escapeHtml(c.author_avatar)}" class="w-full h-full object-cover" alt="" />`
+                  : (c.author_name || 'A').substring(0, 1).toUpperCase()
+                }
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-sm font-semibold text-neutral-900 dark:text-white">${escapeHtml(c.author_name)}</span>
+                  ${c.author_id ? `<span class="text-[10px] px-1.5 py-0.2 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 font-mono">${escapeHtml(c.author_id)}</span>` : ''}
+                  ${c.parent_id ? `<span class="text-[10px] px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-semibold">Reply to #${c.parent_id}</span>` : ''}
+                  ${c.target_paragraph ? `<span class="text-[10px] px-1.5 py-0.2 rounded bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400 font-semibold">Inline Note</span>` : ''}
+                </div>
+                <div class="text-[11px] text-neutral-400">${formattedDate}</div>
+              </div>
+            </div>
+
+            <!-- Article Path Badge -->
+            <a
+              href="/${escapeHtml(c.post_slug)}"
+              target="_blank"
+              class="inline-flex items-center gap-1 text-[11px] font-medium text-sky-600 dark:text-sky-400 hover:underline bg-sky-50 dark:bg-sky-950/50 px-2.5 py-1 rounded-lg border border-sky-100 dark:border-sky-900 self-start sm:self-auto"
+            >
+              <span>/${escapeHtml(c.post_slug)}</span>
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+          </div>
+
+          <!-- Highlighted Quote if inline -->
+          ${c.target_text ? `
+            <div class="mb-3 px-3 py-1.5 rounded-xl bg-neutral-50 dark:bg-neutral-950 border-l-2 border-sky-500 text-xs italic text-neutral-600 dark:text-neutral-400">
+              "${escapeHtml(c.target_text)}"
+            </div>
+          ` : ''}
+
+          <!-- Comment Body Content -->
+          <div class="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-line mb-4 pl-1">
+            ${escapeHtml(c.content)}
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center justify-between pt-3 border-t border-neutral-100 dark:border-neutral-800/80 text-xs">
+            <span class="text-[11px] text-neutral-400 font-mono">ID: #${c.id}</span>
+            <div class="flex items-center gap-2">
+              <a
+                href="/${escapeHtml(c.post_slug)}"
+                target="_blank"
+                class="px-2.5 py-1 rounded-lg font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              >
+                View in Context
+              </a>
+              <button
+                type="button"
+                class="btn-admin-delete px-2.5 py-1 rounded-lg font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
+                data-id="${c.id}"
+              >
+                Delete Comment
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Wire up delete handlers
+    commentsContainer.querySelectorAll('.btn-admin-delete').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        if (!confirm(`Are you sure you want to delete comment #${id}?`)) return;
+
+        try {
+          const token = await getClerkToken();
+          const res = await fetch('/api/admin/comments', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ id: Number(id) }),
+          });
+
+          if (!res.ok) throw new Error('Failed to delete comment');
+          commentsData = commentsData.filter(c => String(c.id) !== String(id));
+          updateStats();
+          filterAndRender();
+        } catch (err: any) {
+          alert('Delete error: ' + err.message);
+        }
+      });
+    });
+  }
+
+  function filterAndRender() {
+    const q = (searchInput?.value || '').toLowerCase().trim();
+    if (currentTab === 'comments') {
+      if (!q) {
+        renderCommentsList(commentsData);
+        return;
+      }
+      const filtered = commentsData.filter(c => 
+        (c.author_name && c.author_name.toLowerCase().includes(q)) ||
+        (c.content && c.content.toLowerCase().includes(q)) ||
+        (c.post_slug && c.post_slug.toLowerCase().includes(q)) ||
+        (c.target_text && c.target_text.toLowerCase().includes(q))
+      );
+      renderCommentsList(filtered);
+    } else {
+      if (!q) {
+        renderFeedbacksList(feedbacksData);
+        return;
+      }
+      const filtered = feedbacksData.filter(f => 
+        (f.name && f.name.toLowerCase().includes(q)) ||
+        (f.email && f.email.toLowerCase().includes(q)) ||
+        (f.custom_message && f.custom_message.toLowerCase().includes(q)) ||
+        (f.quick_feedback && f.quick_feedback.toLowerCase().includes(q)) ||
+        (f.post_title && f.post_title.toLowerCase().includes(q)) ||
+        (f.post_slug && f.post_slug.toLowerCase().includes(q))
+      );
+      renderFeedbacksList(filtered);
+    }
+  }
+
+  function showDashboard() {
+    authCard?.classList.add('hidden');
+    dashboard?.classList.remove('hidden');
+    sessionBadge?.classList.remove('hidden');
+    sessionBadge?.classList.add('flex');
+  }
+
+  function showAuthScreen(customMsg?: string) {
+    if (authMsg && customMsg) {
+      authMsg.innerHTML = customMsg;
+    }
+    authCard?.classList.remove('hidden');
+    dashboard?.classList.add('hidden');
+    sessionBadge?.classList.add('hidden');
+    sessionBadge?.classList.remove('flex');
+  }
+
+  lockBtn?.addEventListener('click', async () => {
+    await signOutUser();
+    showAuthScreen();
+  });
+
+  refreshBtn?.addEventListener('click', () => {
+    fetchComments();
+  });
+
+  searchInput?.addEventListener('input', () => {
+    filterAndRender();
+  });
+
+  function escapeHtml(str: string) {
+    return (str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  checkAdminAndLoad();
+</script>

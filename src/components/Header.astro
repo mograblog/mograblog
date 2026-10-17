@@ -1,0 +1,173 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+---
+
+<header class="border-b border-neutral-200 dark:border-neutral-800 backdrop-blur sticky top-0 z-40 bg-white/80 dark:bg-neutral-950/80 transition-colors">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <a href="/" class="flex items-center space-x-3 group">
+        <div class="w-10 h-10 flex items-center justify-center flex-shrink-0">
+          <img
+            src="/images/logo-light.png"
+            alt="Mograblog Logo"
+            class="w-full h-full object-contain dark:hidden group-hover:scale-105 transition-transform"
+          />
+          <img
+            src="/images/logo-dark.png"
+            alt="Mograblog Logo"
+            class="w-full h-full object-contain hidden dark:block group-hover:scale-105 transition-transform"
+          />
+        </div>
+        <div class="flex flex-col">
+          <span class="font-bold text-lg tracking-tight text-neutral-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+            Mograblog
+          </span>
+          <span class="text-xs text-neutral-500 dark:text-neutral-400 hidden sm:inline -mt-0.5">
+            Let's make it work!
+          </span>
+        </div>
+      </a>
+    </div>
+
+    <nav class="flex items-center space-x-1 sm:space-x-3">
+      <a
+        href="/"
+        class="px-3 py-1.5 text-sm font-medium rounded-md text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+      >
+        Articles
+      </a>
+      <a
+        href="/tags"
+        class="px-3 py-1.5 text-sm font-medium rounded-md text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+      >
+        Tags
+      </a>
+      <a
+        href="/quotes"
+        class="px-3 py-1.5 text-sm font-medium rounded-md text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+      >
+        Quotes
+      </a>
+      <a
+        href="/about"
+        class="px-3 py-1.5 text-sm font-medium rounded-md text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+      >
+        About
+      </a>
+      <div class="w-px h-5 bg-neutral-200 dark:bg-neutral-800 mx-1"></div>
+      <ThemeToggle />
+
+      <div class="w-px h-5 bg-neutral-200 dark:bg-neutral-800 mx-1 hidden sm:block"></div>
+
+      <!-- Auth State in Header -->
+      <div id="header-auth-container" class="flex items-center">
+        <button
+          id="header-btn-signin"
+          type="button"
+          class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 transition-colors"
+        >
+          Sign In
+        </button>
+
+        <div id="header-user-menu" class="hidden items-center gap-2">
+          <!-- Admin Dashboard Link (visible for authorized admin) -->
+          <a
+            id="header-admin-link"
+            href="/admin/comments"
+            class="hidden items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 hover:bg-amber-500/20 active:scale-95 transition-all shadow-sm"
+            title="Admin Moderation Dashboard"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span>Admin</span>
+          </a>
+
+          <div
+            id="header-user-avatar"
+            class="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-sm overflow-hidden flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-sky-500/50 transition-all"
+            title="User Profile"
+          >
+          </div>
+          <button
+            id="header-btn-signout"
+            type="button"
+            class="text-[11px] text-neutral-400 hover:text-red-500 dark:hover:text-red-400 hidden sm:inline transition-colors"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  import { initClerk, getClerkUser, openSignInModal, signOutUser, onAuthChange, openUserProfileModal } from '../lib/clerk';
+
+  const btnSignIn = document.getElementById('header-btn-signin');
+  const btnSignOut = document.getElementById('header-btn-signout');
+  const userMenu = document.getElementById('header-user-menu');
+  const userAvatar = document.getElementById('header-user-avatar');
+  const adminLink = document.getElementById('header-admin-link');
+
+  btnSignIn?.addEventListener('click', () => {
+    openSignInModal();
+  });
+
+  btnSignOut?.addEventListener('click', async () => {
+    await signOutUser();
+  });
+
+  userAvatar?.addEventListener('click', () => {
+    openUserProfileModal();
+  });
+
+  function updateHeaderAuth(user: any) {
+    if (user) {
+      btnSignIn?.classList.add('hidden');
+      userMenu?.classList.remove('hidden');
+      userMenu?.classList.add('flex');
+
+      if (user.isAdmin) {
+        adminLink?.classList.remove('hidden');
+        adminLink?.classList.add('inline-flex');
+      } else {
+        adminLink?.classList.add('hidden');
+        adminLink?.classList.remove('inline-flex');
+      }
+
+      if (userAvatar) {
+        if (user.avatar) {
+          userAvatar.innerHTML = `<img src="${user.avatar}" class="w-full h-full object-cover" alt="${user.name}" />`;
+        } else {
+          userAvatar.textContent = (user.name || 'U').substring(0, 1).toUpperCase();
+        }
+        userAvatar.setAttribute('title', `${user.name || 'User'} (${user.isAdmin ? 'Admin' : 'Signed in'}) - View Profile`);
+      }
+    } else {
+      btnSignIn?.classList.remove('hidden');
+      userMenu?.classList.add('hidden');
+      userMenu?.classList.remove('flex');
+      adminLink?.classList.add('hidden');
+      adminLink?.classList.remove('inline-flex');
+    }
+  }
+
+  async function initHeader() {
+    try {
+      const clerk = await initClerk();
+      const user = getClerkUser(clerk);
+      updateHeaderAuth(user);
+    } catch (e) {
+      console.warn('Clerk header init error:', e);
+    }
+  }
+
+  onAuthChange((user) => {
+    updateHeaderAuth(user);
+  });
+
+  initHeader();
+  document.addEventListener('astro:after-swap', initHeader);
+</script>

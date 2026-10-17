@@ -2,6 +2,8 @@
 title: Contribute a micro library to java with JitPack today! 
 published: 2016-07-23T22:30:00.001-07:00
 layout: post.pug
+cover: /style/images/memes/blueprint-stairs-collision.jpg
+coverTitle: Design Flaws - Blueprint vs Reality
 keywords: java jit
 description: Contributing open source in java is suprt easy with jit.  
 ---

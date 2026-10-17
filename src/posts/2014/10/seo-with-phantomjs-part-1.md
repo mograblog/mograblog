@@ -4,6 +4,8 @@ published: 2014-10-08T02:08:00.000-07:00
 description: make your angular website be seo friendly.
 keywords: angular, seo, phantomjs, javascript
 layout: post.pug
+cover: /style/images/memes/decorative-apple-gate-hole.jpg
+coverTitle: Design Flaws - The Apple Gate Security Hole
 shortcodes: true
 ---
 

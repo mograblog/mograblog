@@ -1,0 +1,52 @@
+---
+import { getCollection, render } from 'astro:content';
+import PostLayout from '../layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  const isDev = import.meta.env.DEV;
+  const posts = await getCollection('posts', ({ data }) => isDev || !data.draft);
+  
+  // Sort posts by date descending
+  const sortedPosts = posts.sort((a, b) => {
+    const dateA = a.data.published ? new Date(a.data.published).getTime() : 0;
+    const dateB = b.data.published ? new Date(b.data.published).getTime() : 0;
+    return dateB - dateA;
+  });
+
+  return sortedPosts.map((entry, index) => {
+    // Normalize slug to match legacy URL structure (e.g. 2009/10/cleaner-java-code-with-cglib)
+    const cleanSlug = entry.id.replace(/\.md$/, '');
+    const prevPost = index < sortedPosts.length - 1 ? {
+      title: sortedPosts[index + 1].data.title,
+      url: `/${sortedPosts[index + 1].id.replace(/\.md$/, '')}`,
+    } : undefined;
+    const nextPost = index > 0 ? {
+      title: sortedPosts[index - 1].data.title,
+      url: `/${sortedPosts[index - 1].id.replace(/\.md$/, '')}`,
+    } : undefined;
+
+    return {
+      params: { slug: cleanSlug },
+      props: { entry, prevPost, nextPost },
+    };
+  });
+}
+
+const { entry, prevPost, nextPost } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<PostLayout
+  title={entry.data.title}
+  published={entry.data.published}
+  slug={entry.id.replace(/\.md$/, '')}
+  description={entry.data.description}
+  keywords={entry.data.keywords}
+  cover={entry.data.cover}
+  coverTitle={entry.data.coverTitle}
+  draft={entry.data.draft}
+  prevPost={prevPost}
+  nextPost={nextPost}
+>
+  <Content />
+</PostLayout>

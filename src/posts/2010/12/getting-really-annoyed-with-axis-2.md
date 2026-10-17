@@ -4,6 +4,8 @@ published: 2010-12-14T07:27:00.000-08:00
 description: how to setup axis2 properly in your project
 keywords: axis2, java
 layout: post.pug
+cover: /style/images/memes/parking-barriers-fail.jpg
+coverTitle: You Had One Job - Parking Barriers Fail
 ---
 
 ## Axis 2 - Not Axis!

@@ -1,0 +1,72 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+
+export async function getStaticPaths() {
+  const isDev = import.meta.env.DEV;
+  const posts = await getCollection('posts', ({ data }) => isDev || !data.draft);
+  const allTags = new Set<string>();
+
+  posts.forEach((post) => {
+    if (post.data.keywords) {
+      post.data.keywords.split(',').forEach((tag) => {
+        const clean = tag.trim().toLowerCase();
+        if (clean) allTags.add(clean);
+      });
+    }
+  });
+
+  return Array.from(allTags).map((tag) => {
+    const filteredPosts = posts.filter((post) =>
+      post.data.keywords
+        ?.split(',')
+        .map((k) => k.trim().toLowerCase())
+        .includes(tag)
+    ).sort((a, b) => {
+      const dateA = a.data.published ? new Date(a.data.published).getTime() : 0;
+      const dateB = b.data.published ? new Date(b.data.published).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    return {
+      params: { tag },
+      props: { tag, posts: filteredPosts },
+    };
+  });
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`Posts tagged with #${tag}`}>
+  <div class="max-w-3xl mx-auto py-6">
+    <div class="mb-8">
+      <a
+        href="/tags"
+        class="inline-flex items-center text-sm font-medium text-neutral-500 hover:text-sky-600 dark:text-neutral-400 dark:hover:text-sky-400 transition-colors"
+      >
+        ← View all tags
+      </a>
+      <h1 class="mt-4 text-3xl font-extrabold text-neutral-900 dark:text-white">
+        #{tag}
+      </h1>
+      <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+        Found {posts.length} {posts.length === 1 ? 'article' : 'articles'}
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4">
+      {posts.map((post) => (
+        <PostCard
+          title={post.data.title}
+          published={post.data.published}
+          description={post.data.description}
+          keywords={post.data.keywords}
+          url={`/${post.id.replace(/\.md$/, '')}`}
+          draft={post.data.draft}
+        />
+      ))}
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mograblog",
+  "compatibility_date": "2024-09-01",
+  "pages_build_output_dir": "dist",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mograblog-comments",
+      "database_id": "ba9fa664-92b8-49f1-8455-209965ca77e9"
+    }
+  ]
+}

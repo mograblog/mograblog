@@ -1,0 +1,798 @@
+---
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+---
+
+<!-- Floating Selection Toolbar (Medium-style) -->
+<div
+  id="selection-comment-tooltip"
+  class="fixed z-50 hidden -translate-x-1/2 -translate-y-full mb-2 px-3 py-1.5 bg-neutral-900 dark:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xl border border-neutral-700/80 items-center gap-1.5 cursor-pointer hover:scale-105 transition-all animate-in fade-in zoom-in-95 duration-150"
+>
+  <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+  </svg>
+  <span>Comment on selection</span>
+</div>
+
+<section id="comments-section" class="mt-16 pt-10 border-t border-neutral-200 dark:border-neutral-800" data-slug={slug}>
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <h3 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+        Comments
+      </h3>
+      <span id="comment-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800">
+        Loading...
+      </span>
+    </div>
+
+    <div class="text-xs text-neutral-500 dark:text-neutral-400 hidden sm:flex items-center gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+      Highlight text or hover on any paragraph to comment inline
+    </div>
+  </div>
+
+  <!-- User Authentication Status Bar -->
+  <div id="auth-status-bar" class="mb-6 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-900/40 flex items-center justify-between">
+    <!-- Logged in state -->
+    <div id="auth-user-info" class="hidden items-center space-x-3">
+      <div id="auth-user-avatar-container" class="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-sm overflow-hidden flex-shrink-0">
+        <span id="auth-user-initial">U</span>
+        <img id="auth-user-avatar-img" class="w-full h-full object-cover hidden" alt="Avatar" />
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span id="auth-user-name" class="text-sm font-semibold text-neutral-900 dark:text-white"></span>
+          <span id="auth-admin-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+            Author / Admin
+          </span>
+          <span id="auth-user-badge" class="px-2 py-0.2 rounded-full text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+            Logged in
+          </span>
+        </div>
+        <span id="auth-user-email" class="text-xs text-neutral-400"></span>
+      </div>
+    </div>
+
+    <!-- Logged out state -->
+    <div id="auth-login-prompt" class="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full gap-3">
+      <div>
+        <h4 class="text-sm font-semibold text-neutral-900 dark:text-white">Sign in to leave comments & inline notes</h4>
+        <p class="text-xs text-neutral-500 dark:text-neutral-400">Join the discussion with Google, GitHub, or Email</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          id="btn-login-clerk"
+          type="button"
+          class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl bg-sky-600 hover:bg-sky-500 text-white active:scale-95 transition-all shadow-sm shadow-sky-600/20"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+          <span>Sign In</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sign out button -->
+    <button
+      id="btn-logout"
+      type="button"
+      class="hidden px-2.5 py-1 text-xs text-neutral-500 hover:text-red-500 dark:text-neutral-400 dark:hover:text-red-400 transition-colors"
+    >
+      Sign out
+    </button>
+  </div>
+
+  <!-- Main Comment Submission Box -->
+  <div id="comment-box-container" class="mb-10 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/50 shadow-sm backdrop-blur">
+    <form id="bottom-comment-form" class="space-y-4">
+      <div class="hidden">
+        <input type="text" id="bottom-website-url-hp" name="website_url_hp" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div>
+        <label for="bottom-comment-text" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+          Add to discussion
+        </label>
+        <textarea
+          id="bottom-comment-text"
+          rows="3"
+          placeholder="Share your thoughts, ask a question, or leave feedback..."
+          required
+          class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all leading-relaxed"
+        ></textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-1">
+        <div class="text-xs text-neutral-400">
+          Markdown supported
+        </div>
+        <button
+          type="submit"
+          id="bottom-submit-btn"
+          class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-xl bg-sky-600 hover:bg-sky-500 text-white shadow-sm shadow-sky-600/20 active:scale-[0.98] transition-all disabled:opacity-50"
+        >
+          Post Comment
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Bottom Comments Feed -->
+  <div id="comments-list" class="space-y-4">
+    <div class="py-8 text-center text-sm text-neutral-400 animate-pulse">
+      Loading comments...
+    </div>
+  </div>
+</section>
+
+<!-- Client Script for Clerk Authentication, Threaded Replies, Edit & In-Place Comments -->
+<script>
+  import { initClerk, getClerkUser, openSignInModal, signOutUser, onAuthChange, getClerkToken, ADMIN_EMAIL, type BlogUser } from '../lib/clerk';
+
+  function initComments() {
+    const section = document.getElementById('comments-section');
+    if (!section) return;
+    const slug = section.dataset.slug;
+    const listEl = document.getElementById('comments-list');
+    const badgeEl = document.getElementById('comment-count-badge');
+    const bottomForm = document.getElementById('bottom-comment-form') as HTMLFormElement;
+    const bottomCommentBox = document.getElementById('bottom-comment-text') as HTMLTextAreaElement;
+    const selectionTooltip = document.getElementById('selection-comment-tooltip');
+
+    // Auth Elements
+    const authUserInfo = document.getElementById('auth-user-info');
+    const authLoginPrompt = document.getElementById('auth-login-prompt');
+    const authUserName = document.getElementById('auth-user-name');
+    const authUserEmail = document.getElementById('auth-user-email');
+    const authUserInitial = document.getElementById('auth-user-initial');
+    const authUserAvatarImg = document.getElementById('auth-user-avatar-img') as HTMLImageElement;
+    const authAdminBadge = document.getElementById('auth-admin-badge');
+    const btnLogout = document.getElementById('btn-logout');
+    const btnLoginClerk = document.getElementById('btn-login-clerk');
+
+    let currentUser: BlogUser | null = null;
+    let allComments: any[] = [];
+
+    // 1. Render Auth Bar UI
+    function renderAuthBar() {
+      if (currentUser) {
+        authUserInfo?.classList.remove('hidden');
+        authUserInfo?.classList.add('flex');
+        authLoginPrompt?.classList.add('hidden');
+        btnLogout?.classList.remove('hidden');
+
+        if (authUserName) authUserName.textContent = currentUser.name;
+        if (authUserEmail) authUserEmail.textContent = currentUser.email;
+
+        if (currentUser.isAdmin) {
+          authAdminBadge?.classList.remove('hidden');
+        } else {
+          authAdminBadge?.classList.add('hidden');
+        }
+
+        if (currentUser.avatar && authUserAvatarImg) {
+          authUserAvatarImg.src = currentUser.avatar;
+          authUserAvatarImg.classList.remove('hidden');
+          authUserInitial?.classList.add('hidden');
+        } else if (authUserInitial) {
+          authUserInitial.textContent = (currentUser.name || 'U').substring(0, 1).toUpperCase();
+          authUserInitial.classList.remove('hidden');
+          authUserAvatarImg?.classList.add('hidden');
+        }
+      } else {
+        authUserInfo?.classList.add('hidden');
+        authLoginPrompt?.classList.remove('hidden');
+        btnLogout?.classList.add('hidden');
+        authAdminBadge?.classList.add('hidden');
+      }
+    }
+
+    // 2. Setup Clerk Auth Listeners & Actions
+    btnLoginClerk?.addEventListener('click', async () => {
+      try {
+        await openSignInModal();
+      } catch (err) {
+        console.error('Clerk login error:', err);
+      }
+    });
+
+    btnLogout?.addEventListener('click', async () => {
+      try {
+        await signOutUser();
+      } catch (err) {
+        console.error('Clerk logout error:', err);
+      }
+    });
+
+    // Initialize Clerk on page load
+    initClerk().then((clerk) => {
+      currentUser = getClerkUser(clerk);
+      renderAuthBar();
+      renderBottomFeed();
+      setupInlineParagraphs();
+    }).catch((e) => {
+      console.warn('Could not initialize Clerk:', e);
+    });
+
+    onAuthChange((user) => {
+      currentUser = user;
+      renderAuthBar();
+      renderBottomFeed();
+      setupInlineParagraphs();
+    });
+
+    // 3. Fetch Comments
+    async function loadComments() {
+      try {
+        const res = await fetch(`/api/comments?slug=${encodeURIComponent(slug || '')}`);
+        if (!res.ok) throw new Error('Failed to load');
+        const data = await res.json();
+        allComments = data.comments || [];
+
+        if (badgeEl) {
+          badgeEl.textContent = `${allComments.length} ${allComments.length === 1 ? 'comment' : 'comments'}`;
+        }
+
+        renderBottomFeed();
+        setupInlineParagraphs();
+      } catch (err) {
+        if (listEl) {
+          listEl.innerHTML = `
+            <div class="p-6 text-center text-sm text-neutral-400 border border-dashed border-neutral-300 dark:border-neutral-800 rounded-xl">
+              No comments yet. Be the first to share your thoughts!
+            </div>
+          `;
+        }
+        if (badgeEl) badgeEl.textContent = '0 comments';
+      }
+    }
+
+    // 4. Render Threaded Comments in Bottom Feed
+    function renderBottomFeed() {
+      if (!listEl) return;
+      if (allComments.length === 0) {
+        listEl.innerHTML = `
+          <div class="p-6 text-center text-sm text-neutral-400 border border-dashed border-neutral-300 dark:border-neutral-800 rounded-xl">
+            No comments yet. Be the first to share your thoughts!
+          </div>
+        `;
+        return;
+      }
+
+      const currentUserId = currentUser?.id;
+      const isAdmin = currentUser?.isAdmin || false;
+
+      // Group comments into root comments and child replies
+      const rootComments = allComments.filter(c => !c.parent_id);
+      const repliesMap = new Map<number, any[]>();
+      allComments.filter(c => c.parent_id).forEach(c => {
+        const pid = Number(c.parent_id);
+        if (!repliesMap.has(pid)) repliesMap.set(pid, []);
+        repliesMap.get(pid)!.push(c);
+      });
+
+      function renderCommentCard(c: any, isReply = false) {
+        const formattedDate = new Date(c.created_at).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        });
+
+        const isCommentAuthor = currentUserId && c.author_id === currentUserId;
+        const canModerate = isCommentAuthor || isAdmin;
+        const isAuthorPost = (c.author_id && c.author_id.toLowerCase().includes('guy.mograbi')) || 
+                             (c.author_name && c.author_name.toLowerCase().includes('guy mograbi'));
+
+        return `
+          <div class="comment-item-card ${isReply ? 'ml-6 sm:ml-10 mt-3 border-l-2 border-sky-500/30 pl-3 sm:pl-4' : ''} p-4 rounded-2xl border border-neutral-200/90 dark:border-neutral-800/90 bg-white/60 dark:bg-neutral-900/40 transition-colors" data-id="${c.id}">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-sm overflow-hidden flex-shrink-0">
+                  ${c.author_avatar 
+                    ? `<img src="${escapeHtml(c.author_avatar)}" class="w-full h-full object-cover" alt="" />`
+                    : (c.author_name || 'A').substring(0, 1).toUpperCase()
+                  }
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                      ${escapeHtml(c.author_name)}
+                    </span>
+                    ${isAuthorPost ? `
+                      <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                        Author
+                      </span>
+                    ` : ''}
+                    ${c.target_paragraph ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800">Line Note</span>` : ''}
+                  </div>
+                </div>
+              </div>
+              <time class="text-xs text-neutral-400 dark:text-neutral-500">${formattedDate}</time>
+            </div>
+
+            ${c.target_text ? `
+              <div class="ml-9 mb-2 px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800/60 border-l-2 border-sky-500 text-xs italic text-neutral-600 dark:text-neutral-400 truncate">
+                "${escapeHtml(c.target_text)}"
+              </div>
+            ` : ''}
+
+            <!-- Comment Content / Editable container -->
+            <div class="comment-content-body text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed pl-9 whitespace-pre-line">
+              ${escapeHtml(c.content)}
+            </div>
+
+            <!-- Action buttons: Reply, Edit, Delete -->
+            <div class="flex items-center gap-3 pl-9 mt-3 text-xs font-medium text-neutral-500 dark:text-neutral-400">
+              <button type="button" class="btn-reply-comment text-sky-600 hover:text-sky-500 dark:text-sky-400 font-semibold flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                Reply
+              </button>
+
+              ${canModerate ? `
+                <button type="button" class="btn-edit-comment hover:text-neutral-900 dark:hover:text-white flex items-center gap-1">
+                  ✏️ Edit
+                </button>
+                <button type="button" class="btn-delete-comment hover:text-red-500 dark:hover:text-red-400 flex items-center gap-1">
+                  🗑️ Delete
+                </button>
+              ` : ''}
+            </div>
+
+            <!-- Reply Box Container (injected on click) -->
+            <div class="reply-composer-slot pl-9 mt-2"></div>
+
+            <!-- Nested Child Replies -->
+            ${(repliesMap.get(Number(c.id)) || []).map(reply => renderCommentCard(reply, true)).join('')}
+          </div>
+        `;
+      }
+
+      listEl.innerHTML = rootComments.map(c => renderCommentCard(c, false)).join('');
+
+      // Wire up event listeners on comment action buttons
+      listEl.querySelectorAll('.comment-item-card').forEach(card => {
+        const commentId = card.getAttribute('data-id');
+        const commentObj = allComments.find(c => String(c.id) === String(commentId));
+        if (!commentObj) return;
+
+        // Reply Handler
+        card.querySelector('.btn-reply-comment')?.addEventListener('click', async () => {
+          const slot = card.querySelector('.reply-composer-slot');
+          if (!slot) return;
+          if (slot.querySelector('form') || slot.querySelector('.reply-signin-box')) {
+            slot.innerHTML = '';
+            return;
+          }
+
+          if (!currentUser) {
+            slot.innerHTML = `
+              <div class="reply-signin-box my-2 p-3 rounded-xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3 animate-in fade-in duration-150">
+                <span class="text-xs text-neutral-600 dark:text-neutral-400">Sign in to leave a reply</span>
+                <div class="flex items-center gap-2">
+                  <button type="button" class="reply-signin-btn px-3 py-1 text-xs font-semibold rounded-lg bg-sky-600 hover:bg-sky-500 text-white flex items-center gap-1.5">Sign In</button>
+                  <button type="button" class="reply-cancel-btn px-2 py-1 text-xs text-neutral-400 hover:text-neutral-600">✕</button>
+                </div>
+              </div>
+            `;
+            slot.querySelector('.reply-cancel-btn')?.addEventListener('click', () => { slot.innerHTML = ''; });
+            slot.querySelector('.reply-signin-btn')?.addEventListener('click', () => { openSignInModal(); });
+            return;
+          }
+
+          slot.innerHTML = `
+            <form class="reply-form my-2 p-3 rounded-xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 space-y-2 animate-in fade-in duration-150">
+              <div class="text-[11px] font-semibold text-neutral-500">Replying as ${escapeHtml(currentUser.name)}</div>
+              <textarea rows="2" placeholder="Write a reply..." required class="w-full px-3 py-1.5 text-xs rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:ring-2 focus:ring-sky-500/30 focus:outline-none"></textarea>
+              <div class="flex justify-end gap-2">
+                <button type="button" class="cancel-reply-btn px-2.5 py-1 text-xs text-neutral-500 hover:text-neutral-900">Cancel</button>
+                <button type="submit" class="submit-reply-btn px-3 py-1 text-xs font-semibold rounded-lg bg-sky-600 hover:bg-sky-500 text-white">Post Reply</button>
+              </div>
+            </form>
+          `;
+
+          const replyForm = slot.querySelector('.reply-form') as HTMLFormElement;
+          const textarea = slot.querySelector('textarea');
+          textarea?.focus();
+
+          slot.querySelector('.cancel-reply-btn')?.addEventListener('click', () => { slot.innerHTML = ''; });
+
+          replyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const replyText = textarea?.value.trim();
+            if (!replyText || !currentUser) return;
+
+            try {
+              const token = await getClerkToken();
+              const res = await fetch('/api/comments', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({
+                  slug,
+                  content: replyText,
+                  parentId: Number(commentId),
+                }),
+              });
+              if (!res.ok) throw new Error('Reply failed');
+              await loadComments();
+            } catch (err: any) {
+              alert('Could not submit reply: ' + err.message);
+            }
+          });
+        });
+
+        // Edit Handler
+        card.querySelector('.btn-edit-comment')?.addEventListener('click', () => {
+          const bodyEl = card.querySelector('.comment-content-body');
+          if (!bodyEl) return;
+
+          const originalText = commentObj.content;
+          bodyEl.innerHTML = `
+            <form class="edit-form my-2 space-y-2">
+              <textarea rows="3" required class="w-full px-3 py-1.5 text-xs rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white focus:ring-2 focus:ring-sky-500/30 focus:outline-none">${escapeHtml(originalText)}</textarea>
+              <div class="flex justify-end gap-2">
+                <button type="button" class="cancel-edit-btn px-2.5 py-1 text-xs text-neutral-500">Cancel</button>
+                <button type="submit" class="save-edit-btn px-3 py-1 text-xs font-semibold rounded-lg bg-sky-600 hover:bg-sky-500 text-white">Save</button>
+              </div>
+            </form>
+          `;
+
+          const textarea = bodyEl.querySelector('textarea');
+          textarea?.focus();
+
+          bodyEl.querySelector('.cancel-edit-btn')?.addEventListener('click', () => {
+            bodyEl.innerHTML = escapeHtml(originalText);
+          });
+
+          bodyEl.querySelector('.edit-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newContent = textarea?.value.trim();
+            if (!newContent) return;
+
+            try {
+              const token = await getClerkToken();
+              const res = await fetch('/api/comments', {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({
+                  id: Number(commentId),
+                  content: newContent,
+                }),
+              });
+              if (!res.ok) throw new Error('Edit failed');
+              commentObj.content = newContent;
+              bodyEl.innerHTML = escapeHtml(newContent) + ' <span class="text-[10px] text-neutral-400 italic">(edited)</span>';
+            } catch (err: any) {
+              alert('Could not save edit: ' + err.message);
+            }
+          });
+        });
+
+        // Delete Handler
+        card.querySelector('.btn-delete-comment')?.addEventListener('click', async () => {
+          if (!confirm('Are you sure you want to delete this comment?')) return;
+          try {
+            const token = await getClerkToken();
+            const res = await fetch('/api/comments', {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({ 
+                id: Number(commentId), 
+              }),
+            });
+            if (!res.ok) throw new Error('Delete failed');
+            await loadComments();
+          } catch (err: any) {
+            alert('Could not delete comment: ' + err.message);
+          }
+        });
+      });
+    }
+
+    // 5. Setup Inline Margin Triggers & In-Place Inline Boxes
+    function setupInlineParagraphs() {
+      const articleEl = document.querySelector('.prose');
+      if (!articleEl) return;
+
+      const paragraphs = articleEl.querySelectorAll('p, h2, h3, blockquote, li');
+      paragraphs.forEach((p, idx) => {
+        const paragraphId = `para-${idx}`;
+        p.setAttribute('data-paragraph-id', paragraphId);
+        (p as HTMLElement).style.position = 'relative';
+
+        p.querySelector('.inline-comment-trigger')?.remove();
+
+        const paraComments = allComments.filter((c) => c.target_paragraph === paragraphId);
+        const count = paraComments.length;
+
+        const btn = document.createElement('button');
+        btn.className = 'inline-comment-trigger absolute -right-7 sm:-right-9 top-0 p-1 rounded-full text-neutral-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-neutral-800 transition-all flex items-center justify-center cursor-pointer';
+        btn.setAttribute('type', 'button');
+        btn.setAttribute('title', count > 0 ? `${count} comment(s) on this line` : 'Comment on this line');
+
+        btn.innerHTML = count > 0 
+          ? `<span class="px-1.5 py-0.5 text-[11px] font-bold rounded-full bg-sky-500 text-white shadow-sm flex items-center gap-0.5">💬 ${count}</span>`
+          : `<span class="opacity-0 group-hover:opacity-100 hover:opacity-100 text-neutral-400 hover:text-sky-500 transition-opacity"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></span>`;
+
+        if (count > 0) {
+          (p as HTMLElement).classList.add('border-l-2', 'border-sky-500/40', 'pl-3');
+        }
+
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleInlineBox(p, paragraphId, p.textContent?.trim().substring(0, 100) || '', paraComments);
+        });
+
+        p.addEventListener('mouseenter', () => {
+          const span = btn.querySelector('span');
+          if (span && count === 0) span.classList.remove('opacity-0');
+        });
+        p.addEventListener('mouseleave', () => {
+          const span = btn.querySelector('span');
+          if (span && count === 0) span.classList.add('opacity-0');
+        });
+
+        p.appendChild(btn);
+      });
+    }
+
+    // 6. Open / Toggle Inline Box Directly Under Paragraph (Zero page scrolling!)
+    function toggleInlineBox(p: Element, paragraphId: string, quote: string, existingComments: any[]) {
+      let box = p.nextElementSibling;
+      if (box && box.classList.contains('inline-comment-box-container')) {
+        box.remove();
+        return;
+      }
+
+      document.querySelectorAll('.inline-comment-box-container').forEach(el => el.remove());
+
+      const container = document.createElement('div');
+      container.className = 'inline-comment-box-container my-4 p-4 rounded-2xl border border-sky-200 dark:border-sky-900 bg-sky-50/50 dark:bg-neutral-900/90 shadow-lg animate-in fade-in zoom-in-95 duration-200 not-prose';
+
+      container.innerHTML = `
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2 text-xs font-semibold text-sky-700 dark:text-sky-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+            <span>Inline Discussion</span>
+          </div>
+          <button type="button" class="close-inline-btn text-xs text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 font-bold p-1">✕</button>
+        </div>
+
+        ${quote ? `
+          <div class="mb-3 px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-950 border border-sky-100 dark:border-sky-950 text-xs italic text-neutral-600 dark:text-neutral-400 truncate">
+            "${escapeHtml(quote)}"
+          </div>
+        ` : ''}
+
+        ${existingComments.length > 0 ? `
+          <div class="mb-4 space-y-2.5 max-h-56 overflow-y-auto pr-1">
+            ${existingComments.map(c => `
+              <div class="p-3 rounded-xl bg-white dark:bg-neutral-950 border border-neutral-200/80 dark:border-neutral-800 text-xs">
+                <div class="flex items-center justify-between font-semibold text-neutral-900 dark:text-white mb-1">
+                  <span>${escapeHtml(c.author_name)}</span>
+                  <span class="text-[10px] text-neutral-400 font-normal">${new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                </div>
+                <div class="text-neutral-700 dark:text-neutral-300 whitespace-pre-line leading-relaxed">${escapeHtml(c.content)}</div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        ${currentUser ? `
+          <form class="inline-comment-form space-y-3">
+            <div class="text-[11px] font-semibold text-neutral-500">
+              Posting as <span class="text-sky-600 dark:text-sky-400">${escapeHtml(currentUser.name)}</span>
+              ${currentUser.isAdmin ? '<span class="ml-1 text-[10px] px-1.5 py-0.2 rounded font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">Author</span>' : ''}
+            </div>
+            <textarea
+              name="content"
+              rows="2"
+              placeholder="Write your inline comment or question..."
+              required
+              class="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 leading-relaxed"
+            ></textarea>
+            <div class="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                class="close-inline-btn px-3 py-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="inline-submit-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-sky-600 hover:bg-sky-500 text-white shadow-sm shadow-sky-600/20 active:scale-95 transition-all"
+              >
+                Post Note
+              </button>
+            </div>
+          </form>
+        ` : `
+          <div class="p-4 text-center rounded-xl bg-white/90 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 text-xs space-y-3">
+            <p class="text-neutral-600 dark:text-neutral-300 font-medium">Sign in to leave a note on this paragraph</p>
+            <button
+              type="button"
+              class="inline-signin-btn inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl bg-sky-600 hover:bg-sky-500 text-white shadow-sm shadow-sky-600/20 active:scale-95 transition-all"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+              <span>Sign In</span>
+            </button>
+          </div>
+        `}
+      `;
+
+      p.after(container);
+      container.querySelector('textarea')?.focus();
+
+      container.querySelectorAll('.close-inline-btn').forEach(btn => {
+        btn.addEventListener('click', () => container.remove());
+      });
+
+      // Keep user in place without scrolling!
+      container.querySelector('.inline-signin-btn')?.addEventListener('click', () => {
+        openSignInModal();
+      });
+
+      const inlineForm = container.querySelector('.inline-comment-form') as HTMLFormElement;
+      inlineForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const contentVal = (inlineForm.querySelector('textarea[name="content"]') as HTMLTextAreaElement).value.trim();
+        const submitBtn = inlineForm.querySelector('.inline-submit-btn') as HTMLButtonElement;
+
+        if (!contentVal || !currentUser) return;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Posting...';
+
+        try {
+          const token = await getClerkToken();
+          const res = await fetch('/api/comments', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({
+              slug,
+              content: contentVal,
+              targetParagraph: paragraphId,
+              targetText: quote,
+            }),
+          });
+
+          if (!res.ok) throw new Error('Failed to post');
+          container.remove();
+          await loadComments();
+        } catch (err: any) {
+          alert('Could not post inline note: ' + err.message);
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Post Note';
+        }
+      });
+    }
+
+    // 7. Selection Tooltip handling
+    let selectedQuote = '';
+    let selectedParaEl: Element | null = null;
+    let selectedParaId = '';
+
+    document.addEventListener('selectionchange', () => {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed || !selectionTooltip) {
+        selectionTooltip?.classList.add('hidden');
+        return;
+      }
+
+      const text = selection.toString().trim();
+      if (text.length < 3) {
+        selectionTooltip?.classList.add('hidden');
+        return;
+      }
+
+      const anchorNode = selection.anchorNode;
+      const parentEl = anchorNode instanceof HTMLElement ? anchorNode : anchorNode?.parentElement;
+      const proseEl = parentEl?.closest('.prose');
+      const paragraphEl = parentEl?.closest('p, h2, h3, h4, blockquote, li');
+
+      if (!proseEl || !paragraphEl) {
+        selectionTooltip?.classList.add('hidden');
+        return;
+      }
+
+      const rect = selection.getRangeAt(0).getBoundingClientRect();
+      if (rect && rect.width > 0) {
+        selectedQuote = text;
+        selectedParaEl = paragraphEl;
+        selectedParaId = paragraphEl.getAttribute('data-para-id') || '';
+
+        if (selectionTooltip) {
+          selectionTooltip.style.top = `${rect.top + window.scrollY - 38}px`;
+          selectionTooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - 40}px`;
+          selectionTooltip.classList.remove('hidden');
+        }
+      }
+    });
+
+    selectionTooltip?.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      selectionTooltip.classList.add('hidden');
+
+      if (selectedParaEl && selectedParaId) {
+        const paraComments = allComments.filter((c) => c.target_paragraph === selectedParaId);
+        toggleInlineBox(selectedParaEl, selectedParaId, selectedQuote, paraComments);
+      }
+    });
+
+    // 8. Bottom Form Submit Handler
+    bottomForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const hp = (document.getElementById('bottom-website-url-hp') as HTMLInputElement)?.value;
+      if (hp) return;
+
+      if (!currentUser) {
+        openSignInModal();
+        return;
+      }
+
+      const content = bottomCommentBox.value.trim();
+      const submitBtn = document.getElementById('bottom-submit-btn') as HTMLButtonElement;
+
+      if (!content) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Posting...';
+
+      try {
+        const token = await getClerkToken();
+        const res = await fetch('/api/comments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            slug,
+            content,
+            parentId: null,
+            targetParagraph: null,
+            targetText: null,
+          }),
+        });
+
+        if (!res.ok) throw new Error('Submission failed');
+        bottomCommentBox.value = '';
+        await loadComments();
+      } catch (err: any) {
+        alert('Could not submit comment: ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Post Comment';
+      }
+    });
+
+    loadComments();
+  }
+
+  function escapeHtml(str: string) {
+    return (str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  initComments();
+  document.addEventListener('astro:after-swap', initComments);
+</script>

@@ -2,6 +2,8 @@
 title: Angular - 5 lines of code to prevent memory leaks
 published: 2015-10-11T22:30:00.001-07:00
 layout: post.pug
+cover: /style/images/memes/striped-stair-carpet-optical-illusion.jpg
+coverTitle: Design Flaws - Optical Illusion Hazard
 keywords: angular, javascript
 description: 5 lines of code in angular written once can affect your entire project by auto releasing resources and cancel delayed action after navigating away from the page. in this post i will explore and explain the problem and its solutions.
 ---

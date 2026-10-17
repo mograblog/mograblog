@@ -3,3 +3,11 @@ node_modules
 build
 bower_components
 package-lock.json
+.env
+.env.*
+.astro
+.wrangler
+dist
+/data/
+scratch/
+!src/data/

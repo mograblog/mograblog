@@ -2,6 +2,8 @@
 title: Add pageviews and news feed to static website with firebase
 published: 2016-08-14T22:30:00.001-07:00
 layout: post.pug
+cover: /style/images/memes/do-not-enter-enter-only.jpg
+coverTitle: You Had One Job - Do Not Enter / Enter Only
 keywords: firebase, pageviews, static website, javascript
 description: Now that you have a static website, lets add pageviews counter and dynamic news feed to it using firebase 
 ---

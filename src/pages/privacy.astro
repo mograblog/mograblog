@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Privacy Policy" description="Privacy Policy for Mograblog">
+  <article class="max-w-2xl mx-auto py-6">
+    <h1 class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white mb-2">Privacy Policy</h1>
+    <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-8">Last updated: September 8, 2026</p>
+
+    <div class="prose prose-neutral dark:prose-invert max-w-none leading-relaxed space-y-6">
+      <section>
+        <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">1. Overview</h2>
+        <p>
+          Welcome to Mograblog (<strong>https://mograblog.com</strong>). This Privacy Policy explains how information is collected, used, and protected when you visit this website, leave comments, submit feedback, or authenticate.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">2. Information We Collect</h2>
+        <ul class="list-disc pl-5 space-y-2">
+          <li>
+            <strong>Authentication Data:</strong> When you sign in using Clerk (via Google, GitHub, or Email), we receive basic public profile information (such as your name, email address, and avatar image) to display your identity on comments.
+          </li>
+          <li>
+            <strong>Comments & Feedback:</strong> Any text, inline notes, or feedback you submit voluntarily on blog posts are stored securely in our database.
+          </li>
+          <li>
+            <strong>Analytics & Read Counts:</strong> We track anonymous, aggregated page view counts and live reader activity to display popular content. No tracking cookies or personal fingerprinting are used.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">3. How Information Is Used</h2>
+        <p>
+          Information is used solely to provide interactive features on Mograblog (authoring comments, submitting feedback, and viewing moderation dashboards). We never sell, monetize, or share your personal data with third-party advertisers.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">4. Third-Party Services</h2>
+        <p>
+          This website utilizes trusted infrastructure partners:
+        </p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li><strong>Cloudflare:</strong> Hosting, DNS, and secure edge network.</li>
+          <li><strong>Clerk:</strong> Secure user authentication and session management.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">5. Contact</h2>
+        <p>
+          If you have questions regarding this Privacy Policy or wish to request deletion of your comments or data, please reach out via the interactive feedback box on any blog post or connect via the links on our <a href="/about" class="text-sky-600 dark:text-sky-400 hover:underline">About page</a>.
+        </p>
+      </section>
+    </div>
+  </article>
+</BaseLayout>

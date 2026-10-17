@@ -7,9 +7,8 @@ layout: post.pug
 shortcodes: true
 ---
 
-[#alert-info]
-This post is old and outdated. please visit the [new one](/2013/04/removing-background-from-image-with-imagemagick-revisited.html)
-[#/alert-info]
+> [!NOTE]
+> **Update:** This 2012 post is preserved for nostalgia! For modern background removal using neural networks (`rembg`, WebGPU, and macOS Quick Actions), check out the new guide: **[Removing Backgrounds from Images: From ImageMagick Hacks to Modern AI](/2026/09/removing-backgrounds-from-images-imagemagick-to-modern-ai)** (or the [2013 ImageMagick follow-up](/2013/04/removing-background-from-image-with-imagemagick-revisited)).
 
 I had a problem.. I bought an image from [istackphoto.com](http://www.istockphoto.com/) and I had to use it.
 Seems the image was in [EPS](http://en.wikipedia.org/wiki/Encapsulated_PostScript) format and had 17MB !!  

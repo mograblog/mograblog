@@ -1,0 +1,30 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="mt-auto border-t border-neutral-200 dark:border-neutral-800 py-8 transition-colors">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-neutral-500 dark:text-neutral-400">
+    <div class="flex items-center space-x-2">
+      <span>© {currentYear} Guy Mograbi.</span>
+      <span>•</span>
+      <span>Let's make it work!</span>
+    </div>
+    <div class="flex items-center space-x-4">
+      <a href="https://github.com/GuyMograbi" target="_blank" rel="noopener noreferrer" class="hover:text-neutral-900 dark:hover:text-white transition-colors">
+        GitHub
+      </a>
+      <a href="https://twitter.com/guymograbi" target="_blank" rel="noopener noreferrer" class="hover:text-neutral-900 dark:hover:text-white transition-colors">
+        Twitter
+      </a>
+      <a href="https://www.linkedin.com/in/guymograbi" target="_blank" rel="noopener noreferrer" class="hover:text-neutral-900 dark:hover:text-white transition-colors">
+        LinkedIn
+      </a>
+      <a href="/privacy" class="hover:text-neutral-900 dark:hover:text-white transition-colors">
+        Privacy
+      </a>
+      <a href="/rss.xml" class="hover:text-neutral-900 dark:hover:text-white transition-colors">
+        RSS
+      </a>
+    </div>
+  </div>
+</footer>

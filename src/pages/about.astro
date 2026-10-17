@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About Guy Mograbi" description="About Guy Mograbi - Software Engineer & Architect">
+  <article class="max-w-2xl mx-auto py-6">
+    <div class="flex items-center space-x-4 mb-8">
+      <div class="w-20 h-20 rounded-2xl p-2.5 border border-neutral-200 dark:border-neutral-800 shadow-md bg-white dark:bg-neutral-900 flex items-center justify-center flex-shrink-0">
+        <img src="/images/logo-light.png" alt="Guy Mograbi Emblem" class="w-full h-full object-contain dark:hidden" />
+        <img src="/images/logo-dark.png" alt="Guy Mograbi Emblem" class="w-full h-full object-contain hidden dark:block" />
+      </div>
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white">Guy Mograbi</h1>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">Software Engineer, Architect & Open Source Contributor</p>
+      </div>
+    </div>
+
+    <div class="prose prose-neutral dark:prose-invert max-w-none leading-relaxed">
+      <p>
+        Hi! I'm Guy Mograbi. I write Mograblog with the motto: <strong>"Let's make it work!"</strong>.
+      </p>
+      <p>
+        Here you will find practical walkthroughs, troubleshooting tips, software architecture guides, and cloud development best practices that I've gathered over years of engineering software.
+      </p>
+
+      <h2>Connect with me</h2>
+      <ul>
+        <li>
+          <strong>GitHub:</strong> <a href="https://github.com/GuyMograbi" target="_blank" rel="noopener noreferrer">@GuyMograbi</a>
+        </li>
+        <li>
+          <strong>Twitter / X:</strong> <a href="https://twitter.com/guymograbi" target="_blank" rel="noopener noreferrer">@guymograbi</a>
+        </li>
+        <li>
+          <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/guymograbi" target="_blank" rel="noopener noreferrer">Guy Mograbi</a>
+        </li>
+      </ul>
+    </div>
+  </article>
+</BaseLayout>

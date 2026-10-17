@@ -4,6 +4,8 @@ published: 2014-12-20T00:00:00.000-08:00
 description: quickly resolve CERT_UNTRUSTED in grunt-aws plugin
 keywords: grunt, grunt-aws
 layout: post.pug
+cover: /style/images/memes/mirror-ceiling-bathroom-fail.jpg
+coverTitle: Design Flaws - Mirror Ceiling Exposure
 ---
 
 If there's anything I hate in the programming world, is when something that worked well suddenly breaks.

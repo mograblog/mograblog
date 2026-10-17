@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import quotes from '../data/quotes.json';
+---
+
+<BaseLayout
+  title="Quotes I Like | Mograblog"
+  description="A curated collection of quotes from books that left a lasting impression on me."
+>
+  <div class="max-w-3xl mx-auto py-8">
+    <header class="mb-10">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800/60 mb-4">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+        <span>Reading Highlights</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900 dark:text-white mb-3">
+        Quotes I Like
+      </h1>
+      <p class="text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
+        Passages, ideas, and principles from books that resonated with me and changed the way I think.
+      </p>
+    </header>
+
+    <div class="space-y-6">
+      {quotes.map((item, index) => (
+        <article class="relative p-6 sm:p-8 rounded-2xl bg-neutral-50/70 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800 transition-colors">
+          <div class="flex items-start gap-4">
+            <span class="text-3xl sm:text-4xl select-none font-serif text-sky-500/40 dark:text-sky-400/30 leading-none">“</span>
+            <div class="flex-1">
+              <blockquote class="text-base sm:text-lg text-neutral-800 dark:text-neutral-200 leading-relaxed font-normal mb-5">
+                {item.quote}
+              </blockquote>
+
+              <div class="pt-4 border-t border-neutral-200/70 dark:border-neutral-800/80 flex flex-wrap items-baseline justify-between gap-2">
+                <div>
+                  <span class="font-semibold text-neutral-900 dark:text-neutral-100 text-sm">
+                    {item.author}
+                  </span>
+                  {item.book && (
+                    <span class="text-xs text-neutral-500 dark:text-neutral-400 block sm:inline sm:ml-2">
+                      <span class="hidden sm:inline">•</span> <cite class="italic">{item.book}</cite>
+                      {item.year && <span> ({item.year})</span>}
+                    </span>
+                  )}
+                </div>
+                <span class="text-xs font-mono text-neutral-400 dark:text-neutral-500">
+                  #{index + 1}
+                </span>
+              </div>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

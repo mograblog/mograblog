@@ -1,0 +1,422 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import CommentsSection from '../components/CommentsSection.astro';
+import LiveReadingSidebar from '../components/LiveReadingSidebar.astro';
+import FeedbackModal from '../components/FeedbackModal.astro';
+import ClapButton from '../components/ClapButton.astro';
+import ShareBar from '../components/ShareBar.astro';
+import BackgroundRemovalTool from '../components/BackgroundRemovalTool.astro';
+import InBrowserAiPlayground from '../components/InBrowserAiPlayground.astro';
+import WebLlmPlayground from '../components/WebLlmPlayground.astro';
+
+interface Props {
+  title: string;
+  published: Date;
+  slug: string;
+  description?: string;
+  keywords?: string;
+  cover?: string;
+  coverTitle?: string;
+  draft?: boolean;
+  prevPost?: { title: string; url: string };
+  nextPost?: { title: string; url: string };
+}
+
+const {
+  title,
+  published,
+  slug,
+  description,
+  keywords,
+  cover,
+  coverTitle,
+  draft = false,
+  prevPost,
+  nextPost,
+} = Astro.props;
+
+const tags = keywords ? keywords.split(',').map((t) => t.trim()).filter(Boolean) : [];
+const publishedIso = published ? new Date(published).toISOString() : undefined;
+
+const blogPostingSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description: description || undefined,
+  image: cover ? new URL(cover, 'https://www.mograblog.com').href : undefined,
+  datePublished: publishedIso,
+  dateModified: publishedIso,
+  author: {
+    '@type': 'Person',
+    name: 'Guy Mograbi',
+    url: 'https://www.mograblog.com/about',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Mograblog',
+    url: 'https://www.mograblog.com',
+  },
+  keywords: tags.join(', '),
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  keywords={keywords}
+  image={cover}
+  containerClass="max-w-6xl"
+  type="article"
+  publishedTime={publishedIso}
+>
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(blogPostingSchema)} />
+  <div class="relative max-w-3xl mx-auto">
+    <!-- Left Sidebar: Visitors are also reading... -->
+    <LiveReadingSidebar slug={slug} title={title} />
+
+    <!-- Main Article Body -->
+    <article class="w-full">
+      <!-- Back to articles -->
+      <div class="mb-8">
+        <a
+          href="/"
+          class="inline-flex items-center text-sm font-medium text-neutral-500 hover:text-sky-600 dark:text-neutral-400 dark:hover:text-sky-400 transition-colors group"
+        >
+          <span class="mr-1 group-hover:-translate-x-0.5 transition-transform">←</span>
+          Back to all articles
+        </a>
+      </div>
+
+      {draft && (
+        <div class="mb-8 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/80 text-amber-900 dark:text-amber-200 flex items-center gap-3 text-sm">
+          <span class="text-2xl flex-shrink-0">⚠️</span>
+          <div>
+            <div class="font-bold flex items-center gap-2">
+              <span>LOCAL DRAFT PREVIEW</span>
+              <span class="px-2 py-0.5 text-xs rounded-full bg-amber-200 dark:bg-amber-900/80 text-amber-900 dark:text-amber-200 font-mono font-semibold">draft: true</span>
+            </div>
+            <p class="text-xs text-amber-800 dark:text-amber-300/90 mt-0.5">
+              This post is only visible on localhost. It is completely excluded from production builds, RSS feeds, and Google's sitemap until published.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <!-- Article Header -->
+      <header class="mb-10 pb-8 border-b border-neutral-200 dark:border-neutral-800">
+        <div class="flex items-center gap-x-3 text-sm text-neutral-500 dark:text-neutral-400 mb-4 flex-wrap">
+          <FormattedDate date={published} />
+          <span>•</span>
+          
+          <!-- View Count Counter -->
+          <span id="post-view-counter" class="inline-flex items-center gap-1 font-medium text-neutral-600 dark:text-neutral-400">
+            <svg class="w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span id="view-count-number">...</span>
+          </span>
+
+          <span>•</span>
+          <!-- Inline Header Clap Button -->
+          <ClapButton slug={slug} variant="inline" />
+
+          <span>•</span>
+          <a
+            href="#comments-section"
+            class="inline-flex items-center gap-1 text-neutral-500 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+            title="Discussion & Comments"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <span>Comments</span>
+          </a>
+
+          <span>•</span>
+          <!-- Share Feedback Modal Trigger -->
+          <button
+            type="button"
+            class="open-feedback-trigger inline-flex items-center gap-1 text-neutral-500 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer"
+            title="Share your feedback"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <span>Feedback</span>
+          </button>
+
+          {tags.length > 0 && (
+            <>
+              <span>•</span>
+              <div class="flex flex-wrap gap-1.5">
+                {tags.map((tag) => (
+                  <a
+                    href={`/tags/${tag.toLowerCase()}`}
+                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+                  >
+                    #{tag}
+                  </a>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-[1.15]">
+          {title}
+        </h1>
+
+        {description && (
+          <p class="mt-4 text-lg text-neutral-600 dark:text-neutral-300 leading-relaxed font-normal">
+            {description}
+          </p>
+        )}
+
+        <!-- Author snippet & Share Row -->
+        <div class="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-neutral-100 dark:border-neutral-800/60">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 flex items-center justify-center flex-shrink-0">
+              <img src="/images/logo-light.png" alt="Guy Mograbi" class="w-full h-full object-contain dark:hidden" />
+              <img src="/images/logo-dark.png" alt="Guy Mograbi" class="w-full h-full object-contain hidden dark:block" />
+            </div>
+            <div>
+              <div class="text-sm font-semibold text-neutral-900 dark:text-white">Guy Mograbi</div>
+              <div class="text-xs text-neutral-500 dark:text-neutral-400">Full Stack & Cloud Engineer</div>
+            </div>
+          </div>
+
+          <!-- Quick Share Links in Header -->
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-neutral-400 hidden sm:inline">Share:</span>
+            <ShareBar title={title} slug={slug} variant="inline" />
+          </div>
+        </div>
+      </header>
+
+      <!-- Optional Cover Image -->
+      {cover && (
+        <div class="mb-10 rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-sm">
+          <img src={cover} alt={coverTitle || title} class="w-full h-auto object-cover max-h-[420px]" />
+        </div>
+      )}
+
+      <!-- Main Content -->
+      <div class="prose prose-neutral dark:prose-invert prose-lg max-w-none prose-headings:scroll-mt-20 prose-pre:my-6 prose-img:rounded-xl">
+        <slot />
+      </div>
+
+      {slug.includes('removing-backgrounds-from-images') && (
+        <div class="hidden">
+          <BackgroundRemovalTool />
+        </div>
+      )}
+
+      {slug.includes('ai-in-the-browser') && (
+        <div class="hidden">
+          <InBrowserAiPlayground />
+        </div>
+      )}
+
+      {slug.includes('webllm') && (
+        <div class="hidden">
+          <WebLlmPlayground />
+        </div>
+      )}
+
+      <!-- Post Footer / Navigation -->
+      <footer class="mt-14 pt-8 border-t border-neutral-200 dark:border-neutral-800">
+        <!-- Compact Unified Action Bar: Claps + Share Icons + Feedback -->
+        <div class="mb-10 p-3.5 sm:p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/60 dark:bg-neutral-900/40 backdrop-blur shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3.5">
+          <!-- Left: Claps Button & Counter -->
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <ClapButton slug={slug} variant="compact" />
+          </div>
+
+          <!-- Right: Share Icons & Feedback Button -->
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2.5 sm:pt-0 border-neutral-100 dark:border-neutral-800/80">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] font-medium text-neutral-400 hidden md:inline mr-1">Share:</span>
+              <ShareBar title={title} slug={slug} variant="icons" />
+            </div>
+
+            <div class="w-px h-5 bg-neutral-200 dark:bg-neutral-800 hidden sm:block mx-1"></div>
+
+            <button
+              type="button"
+              class="open-feedback-trigger inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:opacity-90 active:scale-95 transition-all shadow-sm flex-shrink-0 cursor-pointer"
+              title="Share feedback or suggestions"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              <span>Feedback</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {prevPost ? (
+            <a
+              href={prevPost.url}
+              class="group p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-sky-500/30 dark:hover:border-sky-500/30 bg-white/40 dark:bg-neutral-900/30 hover:bg-white dark:hover:bg-neutral-900 transition-all text-left"
+            >
+              <div class="text-xs text-neutral-500 dark:text-neutral-400 group-hover:text-sky-500 transition-colors">
+                ← Previous Article
+              </div>
+              <div class="mt-1 text-sm font-semibold text-neutral-900 dark:text-white line-clamp-1">
+                {prevPost.title}
+              </div>
+            </a>
+          ) : (
+            <div></div>
+          )}
+
+          {nextPost ? (
+            <a
+              href={nextPost.url}
+              class="group p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-sky-500/30 dark:hover:border-sky-500/30 bg-white/40 dark:bg-neutral-900/30 hover:bg-white dark:hover:bg-neutral-900 transition-all text-right sm:col-start-2"
+            >
+              <div class="text-xs text-neutral-500 dark:text-neutral-400 group-hover:text-sky-500 transition-colors">
+                Next Article →
+              </div>
+              <div class="mt-1 text-sm font-semibold text-neutral-900 dark:text-white line-clamp-1">
+                {nextPost.title}
+              </div>
+            </a>
+          ) : (
+            <div></div>
+          )}
+        </div>
+
+        <!-- Live D1 & Inline Comments Section -->
+        <CommentsSection slug={slug} />
+      </footer>
+    </article>
+  </div>
+
+  <!-- Share Your Feedback Dialog Modal -->
+  <FeedbackModal slug={slug} title={title} />
+
+  <!-- Script for Copy Code Button & Mermaid Diagram Rendering -->
+  <script>
+    function setupCodeBlocks() {
+      const codeBlocks = document.querySelectorAll('pre');
+      codeBlocks.forEach((block) => {
+        if (block.querySelector('.copy-code-button')) return;
+        // Skip code blocks designated for Mermaid rendering
+        if (block.querySelector('code.language-mermaid') || block.classList.contains('language-mermaid') || block.getAttribute('data-language') === 'mermaid') return;
+
+        const button = document.createElement('button');
+        button.className = 'copy-code-button';
+        button.textContent = 'Copy';
+        button.addEventListener('click', async () => {
+          const code = block.querySelector('code')?.innerText || block.innerText;
+          await navigator.clipboard.writeText(code);
+          button.textContent = 'Copied!';
+          setTimeout(() => {
+            button.textContent = 'Copy';
+          }, 2000);
+        });
+        block.appendChild(button);
+      });
+    }
+
+    let mermaidModule: any = null;
+    let diagramCounter = 0;
+
+    async function setupMermaidDiagrams() {
+      const mermaidCodeElements = document.querySelectorAll('pre code.language-mermaid, pre.language-mermaid, pre[data-language="mermaid"]');
+      if (!mermaidCodeElements || mermaidCodeElements.length === 0) return;
+
+      if (!mermaidModule) {
+        try {
+          const mod = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+          mermaidModule = mod.default || mod;
+        } catch (err) {
+          console.warn('Could not load Mermaid.js:', err);
+          return;
+        }
+      }
+
+      const isDark = document.documentElement.classList.contains('dark');
+      mermaidModule.initialize({
+        startOnLoad: false,
+        theme: isDark ? 'dark' : 'default',
+        themeVariables: isDark ? {
+          darkMode: true,
+          background: '#18181b',
+          primaryColor: '#0284c7',
+          primaryTextColor: '#f4f4f5',
+          primaryBorderColor: '#38bdf8',
+          lineColor: '#94a3b8',
+          secondaryColor: '#312e81',
+          tertiaryColor: '#1e293b',
+        } : {
+          darkMode: false,
+          background: '#ffffff',
+          primaryColor: '#0284c7',
+          primaryTextColor: '#0f172a',
+          primaryBorderColor: '#0369a1',
+          lineColor: '#64748b',
+        },
+      });
+
+      const targets = Array.from(mermaidCodeElements).map(el => el.tagName === 'CODE' ? el.parentElement : el);
+      const uniquePres = Array.from(new Set(targets)).filter(Boolean) as HTMLElement[];
+
+      for (const pre of uniquePres) {
+        const rawCode = pre.getAttribute('data-mermaid-raw') || pre.querySelector('code')?.innerText || pre.innerText || '';
+        if (!rawCode.trim()) continue;
+
+        const id = `mermaid-${Date.now()}-${++diagramCounter}`;
+        try {
+          const { svg } = await mermaidModule.render(id, rawCode.trim());
+          let container = pre.nextElementSibling as HTMLElement;
+          if (!container || !container.classList.contains('mermaid-diagram-wrapper')) {
+            container = document.createElement('div');
+            container.className = 'mermaid-diagram-wrapper my-8 p-4 sm:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/60 shadow-sm flex justify-center items-center overflow-x-auto transition-colors';
+            container.setAttribute('data-mermaid-raw', rawCode);
+            pre.parentNode?.insertBefore(container, pre.nextSibling);
+            pre.style.display = 'none';
+          }
+          container.innerHTML = svg;
+          const svgEl = container.querySelector('svg');
+          if (svgEl) {
+            svgEl.style.maxWidth = '100%';
+            svgEl.style.height = 'auto';
+          }
+        } catch (e) {
+          console.warn('Failed to render Mermaid diagram:', e);
+          pre.style.display = 'block';
+        }
+      }
+    }
+
+    // Re-render diagrams when theme changes between light & dark
+    const themeObserver = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.attributeName === 'class') {
+          const containers = document.querySelectorAll('.mermaid-diagram-wrapper');
+          if (containers.length > 0 && mermaidModule) {
+            containers.forEach(c => {
+              const raw = c.getAttribute('data-mermaid-raw');
+              if (raw && c.previousElementSibling) {
+                (c.previousElementSibling as HTMLElement).style.display = 'block';
+                c.remove();
+              }
+            });
+            setupMermaidDiagrams();
+          }
+        }
+      }
+    });
+    themeObserver.observe(document.documentElement, { attributes: true });
+
+    setupCodeBlocks();
+    setupMermaidDiagrams();
+    document.addEventListener('astro:after-swap', () => {
+      setupCodeBlocks();
+      setupMermaidDiagrams();
+    });
+  </script>
+</BaseLayout>

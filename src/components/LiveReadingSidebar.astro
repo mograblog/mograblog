@@ -1,0 +1,177 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+}
+
+const { slug, title } = Astro.props;
+---
+
+<aside id="live-reading-sidebar" class="hidden xl:block w-52 absolute right-[calc(100%+2.5rem)] top-0 h-full pointer-events-auto" data-slug={slug} data-title={title}>
+  <div class="sticky top-24 space-y-4">
+    <div class="text-[12px] font-medium text-neutral-500 dark:text-neutral-400 tracking-tight">
+      Visitors are also reading...
+    </div>
+
+    <div id="live-reading-items" class="space-y-3.5 text-xs">
+      <div class="text-neutral-400 animate-pulse text-[11px]">
+        Loading live activity...
+      </div>
+    </div>
+  </div>
+</aside>
+
+<script>
+  function formatRelativeTime(dateStr: string) {
+    if (!dateStr) return 'recently';
+    const now = new Date().getTime();
+
+    // SQLite datetime('now') returns 'YYYY-MM-DD HH:MM:SS' without timezone suffix.
+    // Ensure it is parsed as UTC by converting space to 'T' and appending 'Z'.
+    let normalized = dateStr;
+    if (!normalized.includes('T')) {
+      normalized = normalized.replace(' ', 'T') + 'Z';
+    } else if (!normalized.endsWith('Z') && !normalized.includes('+')) {
+      normalized = normalized + 'Z';
+    }
+
+    const then = new Date(normalized).getTime();
+    let diffSec = Math.floor((now - then) / 1000);
+    if (isNaN(diffSec) || diffSec < 0) diffSec = 0;
+
+    if (diffSec < 120) return 'right now..';
+    if (diffSec < 3600) {
+      const mins = Math.max(1, Math.floor(diffSec / 60));
+      return `${mins} ${mins === 1 ? 'min' : 'mins'} ago`;
+    }
+    if (diffSec < 86400) {
+      const hours = Math.floor(diffSec / 3600);
+      return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+    }
+    const days = Math.floor(diffSec / 86400);
+    return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+  }
+
+  function formatViews(num: number) {
+    if (!num || isNaN(num)) return '';
+    if (num >= 10000) {
+      return `${(num / 1000).toFixed(1).replace('.0', '')}k views`;
+    }
+    if (num >= 1000) {
+      return `${Number(num).toLocaleString()} views`;
+    }
+    return `${num} ${num === 1 ? 'view' : 'views'}`;
+  }
+
+  function escapeHtml(str: string) {
+    return (str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  async function initLiveAnalytics() {
+    const sidebar = document.getElementById('live-reading-sidebar');
+    const viewCounter = document.getElementById('view-count-number');
+    const container = document.getElementById('live-reading-items');
+    if (!sidebar) return;
+
+    const slug = sidebar.getAttribute('data-slug') || '';
+    const title = sidebar.getAttribute('data-title') || '';
+    const sessionKey = `view_logged_${slug}`;
+
+    // Helper: update DOM with views data
+    function renderViewsData(data: any) {
+      if (!data) return;
+      if (viewCounter && data.views !== undefined) {
+        viewCounter.textContent = Number(data.views).toLocaleString();
+      }
+
+      if (container && Array.isArray(data.recentReads)) {
+        const filtered = data.recentReads.filter((r: any) => r.post_slug !== slug);
+        const list = filtered.length > 0 ? filtered : data.recentReads;
+
+        if (list.length === 0) {
+          container.innerHTML = '<div class="text-[11px] text-neutral-400">Exploring recent posts...</div>';
+          return;
+        }
+
+        container.innerHTML = list.map((item: any) => {
+          const relTime = formatRelativeTime(item.created_at);
+          const viewsBadge = item.views_count ? formatViews(item.views_count) : '';
+          const cleanUrl = item.post_slug.startsWith('/') ? item.post_slug : `/${item.post_slug}`;
+          return `
+            <div class="group">
+              <a
+                href="${escapeHtml(cleanUrl)}"
+                class="block text-[12px] font-medium text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 hover:underline leading-snug transition-colors line-clamp-2"
+              >
+                ${escapeHtml(item.post_title || item.post_slug)}
+              </a>
+              <div class="flex items-center gap-1.5 text-[10.5px] text-neutral-400 dark:text-neutral-500 mt-1 flex-wrap">
+                <span>${escapeHtml(relTime)}</span>
+                ${viewsBadge ? `
+                  <span class="text-neutral-300 dark:text-neutral-700">•</span>
+                  <span class="inline-flex items-center gap-1 font-medium text-neutral-500 dark:text-neutral-400">
+                    <svg class="w-3 h-3 text-neutral-400 dark:text-neutral-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    ${escapeHtml(viewsBadge)}
+                  </span>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    try {
+      // 1. Always load current counts immediately via GET (fast display for readers)
+      const res = await fetch(`/api/views?slug=${encodeURIComponent(slug)}`);
+      if (res.ok) {
+        const data = await res.json();
+        renderViewsData(data);
+      }
+
+      // 2. Client-side Bot & Automation Detection
+      const isAutomated = !!(navigator as any).webdriver || window.document.visibilityState === 'prerender';
+      const alreadyLogged = sessionStorage.getItem(sessionKey);
+
+      // Only increment if not previously logged this session and not an automated browser
+      if (!alreadyLogged && !isAutomated) {
+        let logged = false;
+
+        const sendHumanView = async () => {
+          if (logged || sessionStorage.getItem(sessionKey)) return;
+          logged = true;
+          sessionStorage.setItem(sessionKey, '1');
+
+          try {
+            const postRes = await fetch('/api/views', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ slug, title }),
+            });
+            if (postRes.ok) {
+              const postData = await postRes.json();
+              renderViewsData(postData);
+            }
+          } catch (e) {
+            // Ignore background reporting errors
+          }
+        };
+
+        // Trigger after 2.5s of reading, or immediately on first scroll / click
+        const dwellTimer = setTimeout(sendHumanView, 2500);
+        window.addEventListener('scroll', () => { clearTimeout(dwellTimer); sendHumanView(); }, { once: true, passive: true });
+        window.addEventListener('click', () => { clearTimeout(dwellTimer); sendHumanView(); }, { once: true });
+      }
+    } catch (err) {
+      console.warn('Live analytics error:', err);
+    }
+  }
+
+  initLiveAnalytics();
+  document.addEventListener('astro:after-swap', initLiveAnalytics);
+</script>

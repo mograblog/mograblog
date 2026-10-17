@@ -1,0 +1,73 @@
+---
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+  title: string;
+  published: Date;
+  description?: string;
+  keywords?: string;
+  cover?: string;
+  url: string;
+  featured?: boolean;
+  draft?: boolean;
+}
+
+const { title, published, description, keywords, cover, url, featured = false, draft = false } = Astro.props;
+const tags = keywords ? keywords.split(',').map((t) => t.trim()).filter(Boolean) : [];
+---
+
+<article class={`group relative flex flex-col rounded-2xl border border-neutral-200/80 dark:border-neutral-800/80 bg-white/70 dark:bg-neutral-900/50 hover:bg-white dark:hover:bg-neutral-900 hover:border-sky-500/40 dark:hover:border-sky-500/40 hover:shadow-xl hover:shadow-sky-500/5 transition-all duration-300 overflow-hidden ${featured ? 'md:col-span-2 md:flex-row' : ''}`}>
+  {cover && (
+    <div class={`overflow-hidden bg-neutral-100 dark:bg-neutral-800 ${featured ? 'md:w-1/2 h-56 md:h-auto min-h-[220px]' : 'h-48 w-full'}`}>
+      <img
+        src={cover}
+        alt={title}
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+  )}
+
+  <div class={`flex flex-col flex-1 p-6 ${featured && cover ? 'md:w-1/2 justify-between' : 'justify-between'}`}>
+    <div>
+      <div class="flex items-center gap-x-2 text-xs text-neutral-500 dark:text-neutral-400 mb-2.5 flex-wrap">
+        {draft && (
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-400 border border-amber-300 dark:border-amber-800">
+            DRAFT
+          </span>
+        )}
+        <FormattedDate date={published} />
+        {tags.length > 0 && (
+          <>
+            <span>•</span>
+            <div class="flex flex-wrap gap-1">
+              {tags.slice(0, 2).map((tag) => (
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      <h2 class={`font-bold tracking-tight text-neutral-900 dark:text-neutral-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors ${featured ? 'text-2xl sm:text-3xl' : 'text-xl'}`}>
+        <a href={url} class="focus:outline-none">
+          <span class="absolute inset-0"></span>
+          {title}
+        </a>
+      </h2>
+
+      {description && (
+        <p class={`mt-2.5 text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2 leading-relaxed ${featured ? 'sm:text-base line-clamp-3' : ''}`}>
+          {description}
+        </p>
+      )}
+    </div>
+
+    <div class="mt-5 flex items-center text-xs font-semibold text-sky-600 dark:text-sky-400 group-hover:translate-x-1 transition-transform">
+      Read article <span class="ml-1">→</span>
+    </div>
+  </div>
+</article>

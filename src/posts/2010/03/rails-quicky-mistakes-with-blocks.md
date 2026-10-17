@@ -4,6 +4,8 @@ published: 2010-03-09T09:09:00.000-08:00
 keywords: rails, ruby
 description: avoid my mistakes using rails/ruby blocks
 layout: post.pug
+cover: /style/images/memes/wobbly-road-lines.jpg
+coverTitle: You Had One Job - Wobbly Road Lines
 ---
 
 

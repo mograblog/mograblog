@@ -4,6 +4,8 @@ published: 2014-10-15T02:12:00.000-07:00
 description: make your angular website be seo friendly.
 keywords: angular, seo, phantomjs, javascript
 layout: post.pug
+cover: /style/images/memes/car-elevator-crushed-ceiling.jpg
+coverTitle: Design Flaws - Ceiling Clearance Collision
 shortcodes: true
 ---
 

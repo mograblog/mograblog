@@ -4,6 +4,8 @@ published: 2011-08-08T06:44:00.000-07:00
 description: easily disable a button/link with jquery
 keywords: jquery
 layout: post.pug
+cover: /style/images/memes/handrail-blocking-door.jpg
+coverTitle: You Had One Job - Handrail Blocking Door
 shortcodes: true
 ---
 

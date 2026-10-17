@@ -4,6 +4,8 @@ published: 2011-05-15T00:59:00.000-07:00
 description: oneToOne is not what you thought. read more to avoid a pitfall.
 keywords: jpa
 layout: post.pug
+cover: /style/images/memes/privacy-fail-toilet-stall.jpg
+coverTitle: Design Flaws - Lack of Isolation
 ---
 
 

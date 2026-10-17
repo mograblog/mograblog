@@ -1,0 +1,742 @@
+---
+---
+
+<!-- BLOCK 1: IN-BROWSER LLM DEMO -->
+<div id="ai-llm-card" class="not-prose my-8 p-5 sm:p-7 rounded-2xl border border-sky-500/30 bg-gradient-to-b from-sky-50/60 to-white dark:from-neutral-900 dark:to-neutral-950 shadow-xl backdrop-blur">
+  <!-- Top Bar: Header & Cache Manager -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200 dark:border-neutral-800">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 uppercase tracking-wider">Demo 1</span>
+        <h3 class="text-base sm:text-lg font-bold text-neutral-900 dark:text-white m-0">In-Browser Language Model</h3>
+      </div>
+      <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 mb-0">
+        Run offline conversational text generation in your browser tab via WebGPU / WASM.
+      </p>
+    </div>
+
+    <!-- Storage Manager & Purge Button -->
+    <div class="flex items-center gap-2 self-start sm:self-auto bg-neutral-100 dark:bg-neutral-800/80 px-2.5 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700">
+      <div class="flex flex-col text-left">
+        <span class="text-[9px] uppercase font-bold text-neutral-400 dark:text-neutral-500 tracking-wider">Cached</span>
+        <span class="storage-usage-text text-xs font-semibold text-neutral-800 dark:text-neutral-200">Checking...</span>
+      </div>
+      <div class="w-px h-5 bg-neutral-200 dark:border-neutral-700 mx-0.5"></div>
+      <button
+        type="button"
+        class="btn-purge-storage inline-flex items-center gap-1 px-2 py-1 text-[11px] font-semibold rounded-lg bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-950/40 dark:hover:bg-red-900/60 dark:text-red-400 border border-red-200 dark:border-red-900/50 transition-colors cursor-pointer"
+        title="Delete all downloaded weights from browser storage"
+      >
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        <span>Purge</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Model Selector Dropdown -->
+  <div class="mt-4 p-3.5 rounded-xl border border-sky-500/20 bg-sky-50/40 dark:bg-sky-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+    <div class="flex-1">
+      <label for="llm-model-select" class="block font-bold text-sky-900 dark:text-sky-300 mb-1.5">
+        Choose Model:
+      </label>
+      <select
+        id="llm-model-select"
+        class="w-full sm:w-auto text-xs font-semibold p-2 pr-8 rounded-lg border border-sky-300 dark:border-sky-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:ring-2 focus:ring-sky-500 cursor-pointer"
+      >
+        <option value="onnx-community/Qwen2.5-0.5B-Instruct" data-size="~390 MB" data-desc="Qwen 2.5 (500M) - Noticeably smarter reasoning, follows instructions, and gives coherent answers." selected>
+          🧠 Qwen 2.5 (0.5B) - Smarter & Coherent (~390 MB) [Recommended]
+        </option>
+        <option value="HuggingFaceTB/SmolLM2-360M-Instruct" data-size="~200 MB" data-desc="SmolLM2 (360M) - Balanced speed and intelligence, decent conversational quality.">
+          ⚡ SmolLM2 (360M) - Balanced (~200 MB)
+        </option>
+        <option value="HuggingFaceTB/SmolLM2-135M-Instruct" data-size="~100 MB" data-desc="SmolLM2 (135M) - Ultra-lightweight micro model. Fastest download, but prone to silly hallucinations.">
+          🪶 SmolLM2 (135M) - Featherweight (~100 MB)
+        </option>
+      </select>
+      <p id="llm-model-desc" class="text-neutral-500 dark:text-neutral-400 m-0 mt-1.5 text-[11.5px] leading-normal">
+        Qwen 2.5 (500M) - Noticeably smarter reasoning, follows instructions, and gives coherent answers.
+      </p>
+    </div>
+    <span id="llm-model-badge" class="px-2.5 py-1 rounded-lg font-bold bg-white dark:bg-neutral-800 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex-shrink-0 self-start sm:self-center">
+      Download: ~390 MB
+    </span>
+  </div>
+
+  <!-- Download Progress Indicator -->
+  <div id="llm-progress-container" class="hidden my-4 p-4 rounded-xl border border-sky-500/30 bg-sky-50 dark:bg-sky-950/40">
+    <div class="flex items-center justify-between text-xs font-semibold text-sky-900 dark:text-sky-300 mb-2">
+      <span id="llm-progress-status">Downloading model weights...</span>
+      <span id="llm-progress-percent">0%</span>
+    </div>
+    <div class="w-full h-2 rounded-full bg-sky-200 dark:bg-sky-900/60 overflow-hidden">
+      <div id="llm-progress-bar" class="h-full bg-sky-500 rounded-full transition-all duration-300 w-0"></div>
+    </div>
+  </div>
+
+  <!-- Prompt Input & Controls -->
+  <div class="space-y-3 mt-4">
+    <div>
+      <label class="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+        Prompt:
+      </label>
+      <textarea
+        id="llm-prompt-input"
+        rows="2"
+        class="w-full text-sm p-3 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+        placeholder="Ask a question (e.g. 'List 3 fun things I should do today')"
+      >List 3 fun things I should do today</textarea>
+    </div>
+
+    <div class="flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span class="text-xs text-neutral-400">Presets:</span>
+        <button type="button" class="preset-btn px-2 py-0.5 text-xs rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-sky-500 text-neutral-600 dark:text-neutral-300" data-text="List 3 fun things I should do today.">
+          📝 3 Things to Do
+        </button>
+        <button type="button" class="preset-btn px-2 py-0.5 text-xs rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-sky-500 text-neutral-600 dark:text-neutral-300" data-text="Give me a 3-bullet haiku about koalas.">
+          🐨 Koalas
+        </button>
+        <button type="button" class="preset-btn px-2 py-0.5 text-xs rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-sky-500 text-neutral-600 dark:text-neutral-300" data-text="Write a 1-sentence joke about JavaScript.">
+          ⚡ JS Joke
+        </button>
+      </div>
+
+      <button
+        type="button"
+        id="btn-run-llm"
+        class="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-sky-600 hover:bg-sky-500 text-white shadow-md active:scale-95 transition-all cursor-pointer"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+        <span id="btn-run-llm-text">Generate In-Browser (~390MB)</span>
+      </button>
+    </div>
+
+    <!-- Output Display -->
+    <div class="mt-4">
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-xs font-semibold text-neutral-500 dark:text-neutral-400">Local Response:</span>
+        <span id="llm-metrics" class="text-[11px] font-mono text-neutral-400">Ready</span>
+      </div>
+      <div
+        id="llm-output-box"
+        class="min-h-[90px] p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/60 text-sm font-sans text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap leading-relaxed"
+      >Click "Generate" above to load the model and stream tokens directly on your machine.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- BLOCK 2: IN-BROWSER VOICE SYNTHESIS DEMO -->
+<div id="ai-tts-card" class="not-prose my-8 p-5 sm:p-7 rounded-2xl border border-purple-500/30 bg-gradient-to-b from-purple-50/60 to-white dark:from-neutral-900 dark:to-neutral-950 shadow-xl backdrop-blur">
+  <!-- Top Bar: Header & Cache Manager -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200 dark:border-neutral-800">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 uppercase tracking-wider">Demo 2</span>
+        <h3 class="text-base sm:text-lg font-bold text-neutral-900 dark:text-white m-0">In-Browser Neural Voice Synthesizer</h3>
+      </div>
+      <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 mb-0">
+        Generate natural speech locally in your browser memory with zero server latency.
+      </p>
+    </div>
+
+    <!-- Storage Manager & Purge Button -->
+    <div class="flex items-center gap-2 self-start sm:self-auto bg-neutral-100 dark:bg-neutral-800/80 px-2.5 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700">
+      <div class="flex flex-col text-left">
+        <span class="text-[9px] uppercase font-bold text-neutral-400 dark:text-neutral-500 tracking-wider">Cached</span>
+        <span class="storage-usage-text text-xs font-semibold text-neutral-800 dark:text-neutral-200">Checking...</span>
+      </div>
+      <div class="w-px h-5 bg-neutral-200 dark:border-neutral-700 mx-0.5"></div>
+      <button
+        type="button"
+        class="btn-purge-storage inline-flex items-center gap-1 px-2 py-1 text-[11px] font-semibold rounded-lg bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-950/40 dark:hover:bg-red-900/60 dark:text-red-400 border border-red-200 dark:border-red-900/50 transition-colors cursor-pointer"
+        title="Delete all downloaded weights from browser storage"
+      >
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        <span>Purge</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Engine & Voice Selectors -->
+  <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+    <!-- Engine Dropdown -->
+    <div class="p-3.5 rounded-xl border border-purple-500/20 bg-purple-50/40 dark:bg-purple-950/20">
+      <label for="tts-engine-select" class="block font-bold text-purple-900 dark:text-purple-300 mb-1.5">
+        Choose TTS Model:
+      </label>
+      <select
+        id="tts-engine-select"
+        class="w-full text-xs font-semibold p-2 rounded-lg border border-purple-300 dark:border-purple-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:ring-2 focus:ring-purple-500 cursor-pointer"
+      >
+        <option value="kokoro" data-size="~90 MB" selected>
+          🌟 Kokoro-82M — Ultra-Natural Human (~90 MB) [Recommended]
+        </option>
+        <option value="speecht5" data-size="~35 MB">
+          ⚡ SpeechT5 — Classic Featherweight (~35 MB)
+        </option>
+      </select>
+      <p id="tts-engine-desc" class="text-neutral-500 dark:text-neutral-400 m-0 mt-1.5 text-[11.5px] leading-normal">
+        Kokoro: State-of-the-art 82M model with lifelike human inflections & emotion.
+      </p>
+    </div>
+
+    <!-- Voice Tone Dropdown -->
+    <div class="p-3.5 rounded-xl border border-purple-500/20 bg-purple-50/40 dark:bg-purple-950/20 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <label for="tts-voice-select" class="block font-bold text-purple-900 dark:text-purple-300">
+            Voice Character:
+          </label>
+          <span id="tts-size-badge" class="px-2 py-0.5 rounded font-bold bg-white dark:bg-neutral-800 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 text-[11px]">
+            Download: ~90 MB
+          </span>
+        </div>
+        <select
+          id="tts-voice-select"
+          class="w-full text-xs font-semibold p-2 rounded-lg border border-purple-300 dark:border-purple-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:ring-2 focus:ring-purple-500 cursor-pointer"
+        >
+          <!-- Populated dynamically via JavaScript -->
+        </select>
+      </div>
+      <p id="tts-voice-note" class="text-neutral-500 dark:text-neutral-400 m-0 mt-1.5 text-[11.5px] leading-normal">
+        Select from female or male voices with different regional accents.
+      </p>
+    </div>
+  </div>
+
+  <!-- Download Progress Indicator -->
+  <div id="tts-progress-container" class="hidden my-4 p-4 rounded-xl border border-purple-500/30 bg-purple-50 dark:bg-purple-950/40">
+    <div class="flex items-center justify-between text-xs font-semibold text-purple-900 dark:text-purple-300 mb-2">
+      <span id="tts-progress-status">Downloading voice model...</span>
+      <span id="tts-progress-percent">0%</span>
+    </div>
+    <div class="w-full h-2 rounded-full bg-purple-200 dark:bg-purple-900/60 overflow-hidden">
+      <div id="tts-progress-bar" class="h-full bg-purple-500 rounded-full transition-all duration-300 w-0"></div>
+    </div>
+  </div>
+
+  <!-- TTS Input & Controls -->
+  <div class="space-y-3 mt-4">
+    <div>
+      <label class="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+        Text to Synthesize:
+      </label>
+      <input
+        type="text"
+        id="tts-text-input"
+        class="w-full text-sm p-3 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+        value="Hello from Mograblog! This voice was generated entirely on your device with zero server calls."
+      />
+    </div>
+
+    <div class="flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span class="text-xs text-neutral-400">Presets:</span>
+        <button type="button" class="tts-preset-btn px-2 py-0.5 text-xs rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-purple-500 text-neutral-600 dark:text-neutral-300" data-text="Hello from Mograblog! This voice was generated entirely on your device with zero server calls.">
+          👋 Intro
+        </button>
+        <button type="button" class="tts-preset-btn px-2 py-0.5 text-xs rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-purple-500 text-neutral-600 dark:text-neutral-300" data-text="Did you know that koalas can sleep up to 20 hours a day in eucalyptus trees?">
+          🐨 Koalas
+        </button>
+        <button type="button" class="tts-preset-btn px-2 py-0.5 text-xs rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-purple-500 text-neutral-600 dark:text-neutral-300" data-text="Running artificial intelligence right in the browser is surprisingly fast with WebGPU.">
+          ⚡ WebGPU
+        </button>
+      </div>
+
+      <button
+        type="button"
+        id="btn-run-tts"
+        class="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 hover:bg-purple-500 text-white shadow-md active:scale-95 transition-all cursor-pointer"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        </svg>
+        <span id="btn-run-tts-text">Synthesize Audio (~90MB)</span>
+      </button>
+    </div>
+
+    <!-- Audio Output Player -->
+    <div id="tts-audio-container" class="hidden mt-4 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <audio id="tts-audio-player" controls class="w-full sm:w-auto flex-1"></audio>
+      <div class="flex items-center gap-3 text-xs">
+        <span id="tts-timer-metric" class="font-mono text-neutral-400"></span>
+        <span class="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 flex-shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Generated Locally
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let transformersModule: any = null;
+  let kokoroModule: any = null;
+  let llmPipeline: any = null;
+  let currentLoadedModelId: string | null = null;
+  let speecht5Pipeline: any = null;
+  let kokoroInstance: any = null;
+
+  async function getTransformers() {
+    if (transformersModule) return transformersModule;
+    if (typeof (window as any).Float16Array === 'undefined') {
+      (window as any).Float16Array = (window as any).Uint16Array;
+    }
+    transformersModule = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.3/+esm');
+    return transformersModule;
+  }
+
+  async function getKokoroModule() {
+    if (kokoroModule) return kokoroModule;
+    kokoroModule = await import('https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js');
+    return kokoroModule;
+  }
+
+  async function updateStorageEstimate() {
+    const textEls = document.querySelectorAll('.storage-usage-text');
+    if (!textEls.length) return;
+    if (navigator.storage && navigator.storage.estimate) {
+      try {
+        const estimate = await navigator.storage.estimate();
+        const mb = ((estimate.usage || 0) / (1024 * 1024)).toFixed(1);
+        textEls.forEach((el) => { el.textContent = `${mb} MB cached`; });
+      } catch (e) {
+        textEls.forEach((el) => { el.textContent = 'Active'; });
+      }
+    } else {
+      textEls.forEach((el) => { el.textContent = 'Ready'; });
+    }
+  }
+
+  async function purgeAllAiStorage() {
+    try {
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        for (const k of keys) {
+          if (k.includes('transformers') || k.includes('onnx') || k.includes('imgly') || k.includes('kokoro')) {
+            await caches.delete(k);
+          }
+        }
+      }
+
+      if (window.indexedDB && indexedDB.databases) {
+        const dbs = await indexedDB.databases();
+        for (const db of dbs) {
+          if (db.name && (db.name.includes('transformers') || db.name.includes('onnx') || db.name.includes('keyval'))) {
+            indexedDB.deleteDatabase(db.name);
+          }
+        }
+      }
+
+      llmPipeline = null;
+      currentLoadedModelId = null;
+      speecht5Pipeline = null;
+      kokoroInstance = null;
+
+      const textEls = document.querySelectorAll('.storage-usage-text');
+      textEls.forEach((el) => { el.textContent = '0 MB (Purged!)'; });
+
+      alert('All downloaded neural weights and local caches have been wiped from your browser!');
+      await updateStorageEstimate();
+    } catch (e) {
+      console.error('Error purging cache:', e);
+      alert('Cache cleared!');
+      await updateStorageEstimate();
+    }
+  }
+
+  const KOKORO_VOICES = [
+    { id: 'af_heart', label: '❤️ Heart — US Female (Warm & Natural)' },
+    { id: 'af_bella', label: '🔥 Bella — US Female (Expressive)' },
+    { id: 'af_nicole', label: '🎧 Nicole — US Female (Clear & Calm)' },
+    { id: 'am_adam', label: '🎙️ Adam — US Male (Deep & Resonant)' },
+    { id: 'am_michael', label: '💬 Michael — US Male (Conversational)' },
+    { id: 'bf_emma', label: '🇬🇧 Emma — British Female' },
+    { id: 'bm_george', label: '🇬🇧 George — British Male' },
+  ];
+
+  const SPEECHT5_VOICES = [
+    { id: 'https://huggingface.co/datasets/Xenova/cmu-arctic-xvectors-extracted/resolve/main/cmu_us_slt_arctic-wav-arctic_a0001.bin', label: '👩 Stephanie — US Female (Clear)' },
+    { id: 'https://huggingface.co/datasets/Xenova/cmu-arctic-xvectors-extracted/resolve/main/cmu_us_bdl_arctic-wav-arctic_a0001.bin', label: '👨 Brian — US Male (Deep & Baritone)' },
+    { id: 'https://huggingface.co/datasets/Xenova/cmu-arctic-xvectors-extracted/resolve/main/cmu_us_clb_arctic-wav-arctic_a0001.bin', label: '👩 Carol — US Female 2 (Warm)' },
+    { id: 'https://huggingface.co/datasets/Xenova/cmu-arctic-xvectors-extracted/resolve/main/cmu_us_rms_arctic-wav-arctic_a0001.bin', label: '👨 Richard — US Male 2 (Crisp)' },
+    { id: 'https://huggingface.co/datasets/Xenova/cmu-arctic-xvectors-extracted/resolve/main/cmu_us_awb_arctic-wav-arctic_a0001.bin', label: '🏴󠁧󠁢󠁳󠁣󠁴󠁿 Alistair — Scottish Male' },
+  ];
+
+  function setupAiPlayground() {
+    // Mount Demo 1: LLM Card
+    const llmCard = document.getElementById('ai-llm-card');
+    const llmMount = document.getElementById('live-llm-mount');
+    if (llmCard && llmMount && llmCard.parentElement !== llmMount) {
+      llmMount.appendChild(llmCard);
+      llmCard.classList.remove('hidden');
+    }
+
+    // Mount Demo 2: TTS Card
+    const ttsCard = document.getElementById('ai-tts-card');
+    const ttsMount = document.getElementById('live-tts-mount');
+    if (ttsCard && ttsMount && ttsCard.parentElement !== ttsMount) {
+      ttsMount.appendChild(ttsCard);
+      ttsCard.classList.remove('hidden');
+    }
+
+    updateStorageEstimate();
+
+    // Hook Purge Buttons on both cards
+    document.querySelectorAll('.btn-purge-storage').forEach((btn) => {
+      btn.addEventListener('click', purgeAllAiStorage);
+    });
+
+    // LLM Presets
+    document.querySelectorAll('.preset-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const text = btn.getAttribute('data-text');
+        const input = document.getElementById('llm-prompt-input') as HTMLTextAreaElement | null;
+        if (input && text) {
+          input.value = text;
+          input.focus();
+        }
+      });
+    });
+
+    // TTS Presets
+    document.querySelectorAll('.tts-preset-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const text = btn.getAttribute('data-text');
+        const input = document.getElementById('tts-text-input') as HTMLInputElement | null;
+        if (input && text) {
+          input.value = text;
+          input.focus();
+        }
+      });
+    });
+
+    // LLM Elements
+    const btnRunLlm = document.getElementById('btn-run-llm');
+    const btnRunLlmText = document.getElementById('btn-run-llm-text');
+    const llmPrompt = document.getElementById('llm-prompt-input') as HTMLTextAreaElement | null;
+    const llmOutput = document.getElementById('llm-output-box');
+    const llmProgress = document.getElementById('llm-progress-container');
+    const llmStatus = document.getElementById('llm-progress-status');
+    const llmPercent = document.getElementById('llm-progress-percent');
+    const llmBar = document.getElementById('llm-progress-bar');
+    const llmMetrics = document.getElementById('llm-metrics');
+    const modelSelect = document.getElementById('llm-model-select') as HTMLSelectElement | null;
+    const modelDesc = document.getElementById('llm-model-desc');
+    const modelBadge = document.getElementById('llm-model-badge');
+
+    modelSelect?.addEventListener('change', () => {
+      const selectedOption = modelSelect.options[modelSelect.selectedIndex];
+      const size = selectedOption.getAttribute('data-size') || '~390 MB';
+      const desc = selectedOption.getAttribute('data-desc') || '';
+      if (modelDesc) modelDesc.textContent = desc;
+      if (modelBadge) modelBadge.textContent = `Download: ${size}`;
+      if (btnRunLlmText && !btnRunLlm?.hasAttribute('disabled')) {
+        btnRunLlmText.textContent = `Generate In-Browser (${size})`;
+      }
+    });
+
+    btnRunLlm?.addEventListener('click', async () => {
+      const prompt = llmPrompt?.value.trim();
+      if (!prompt) return;
+
+      const selectedModelId = modelSelect?.value || 'onnx-community/Qwen2.5-0.5B-Instruct';
+      const selectedOption = modelSelect?.options[modelSelect.selectedIndex];
+      const modelSize = selectedOption?.getAttribute('data-size') || '~390 MB';
+
+      if (llmPipeline && currentLoadedModelId !== selectedModelId) {
+        llmPipeline = null;
+        currentLoadedModelId = null;
+      }
+
+      btnRunLlm.setAttribute('disabled', 'true');
+      btnRunLlm.classList.add('opacity-60');
+      if (llmOutput) llmOutput.textContent = 'Preparing model...';
+
+      try {
+        const { pipeline } = await getTransformers();
+
+        if (!llmPipeline) {
+          llmProgress?.classList.remove('hidden');
+          const shortName = selectedModelId.split('/')[1] || selectedModelId;
+          if (llmStatus) llmStatus.textContent = `Downloading ${shortName} (${modelSize})...`;
+
+          llmPipeline = await pipeline('text-generation', selectedModelId, {
+            dtype: 'q4',
+            device: 'webgpu',
+            progress_callback: (p: any) => {
+              if (p.status === 'progress' && p.total > 0) {
+                const pct = Math.round((p.loaded / p.total) * 100);
+                if (llmPercent) llmPercent.textContent = `${pct}%`;
+                if (llmBar) llmBar.style.width = `${pct}%`;
+                if (llmStatus) llmStatus.textContent = `Downloading ${p.file} (${pct}%)...`;
+              }
+            }
+          }).catch(async (err: any) => {
+            console.warn('WebGPU q4 init failed, trying q8/WASM fallback:', err);
+            if (llmStatus) llmStatus.textContent = 'WebGPU fallback to WASM...';
+            return await pipeline('text-generation', selectedModelId, {
+              dtype: 'q8',
+              device: 'wasm',
+            });
+          });
+
+          currentLoadedModelId = selectedModelId;
+          llmProgress?.classList.add('hidden');
+          await updateStorageEstimate();
+        }
+
+        if (llmOutput) llmOutput.textContent = 'Generating response...\n';
+        if (btnRunLlmText) btnRunLlmText.textContent = 'Running...';
+
+        const startTime = performance.now();
+
+        const messages = [
+          { role: 'system', content: 'You are a helpful, concise assistant.' },
+          { role: 'user', content: prompt }
+        ];
+
+        let formattedInput = prompt;
+        if (llmPipeline.tokenizer?.apply_chat_template) {
+          try {
+            formattedInput = llmPipeline.tokenizer.apply_chat_template(messages, {
+              tokenize: false,
+              add_generation_prompt: true,
+            });
+          } catch (e) {
+            console.warn('apply_chat_template fallback:', e);
+            formattedInput = `<|im_start|>system\nYou are a helpful, concise assistant.<|im_end|>\n<|im_start|>user\n${prompt}<|im_end|>\n<|im_start|>assistant\n`;
+          }
+        } else {
+          formattedInput = `<|im_start|>system\nYou are a helpful, concise assistant.<|im_end|>\n<|im_start|>user\n${prompt}<|im_end|>\n<|im_start|>assistant\n`;
+        }
+
+        const output = await llmPipeline(formattedInput, {
+          max_new_tokens: 180,
+          temperature: 0.6,
+          do_sample: true,
+          return_full_text: false,
+        });
+
+        const elapsedSec = ((performance.now() - startTime) / 1000).toFixed(2);
+        let answer = output[0]?.generated_text || '';
+        if (typeof answer !== 'string' && Array.isArray(answer)) {
+          answer = answer[answer.length - 1]?.content || '';
+        }
+
+        answer = answer
+          .replace(/<\|im_end\|>/g, '')
+          .replace(/<\|endoftext\|>/g, '')
+          .replace(/<\|im_start\|>/g, '')
+          .trim();
+
+        if (llmOutput) {
+          llmOutput.textContent = answer || 'No response generated.';
+        }
+        if (llmMetrics) {
+          llmMetrics.textContent = `Completed in ${elapsedSec}s`;
+        }
+
+      } catch (err: any) {
+        console.error('LLM generation error:', err);
+        if (llmOutput) llmOutput.textContent = `Error: ${err?.message || err}`;
+      } finally {
+        btnRunLlm.removeAttribute('disabled');
+        btnRunLlm.classList.remove('opacity-60');
+        if (btnRunLlmText) btnRunLlmText.textContent = 'Generate Again';
+        await updateStorageEstimate();
+      }
+    });
+
+    // TTS Elements
+    const btnRunTts = document.getElementById('btn-run-tts');
+    const btnRunTtsText = document.getElementById('btn-run-tts-text');
+    const ttsInput = document.getElementById('tts-text-input') as HTMLInputElement | null;
+    const ttsProgress = document.getElementById('tts-progress-container');
+    const ttsStatus = document.getElementById('tts-progress-status');
+    const ttsPercent = document.getElementById('tts-progress-percent');
+    const ttsBar = document.getElementById('tts-progress-bar');
+    const ttsContainer = document.getElementById('tts-audio-container');
+    const ttsPlayer = document.getElementById('tts-audio-player') as HTMLAudioElement | null;
+    const ttsTimer = document.getElementById('tts-timer-metric');
+    const engineSelect = document.getElementById('tts-engine-select') as HTMLSelectElement | null;
+    const voiceSelect = document.getElementById('tts-voice-select') as HTMLSelectElement | null;
+    const engineDesc = document.getElementById('tts-engine-desc');
+    const sizeBadge = document.getElementById('tts-size-badge');
+
+    function populateVoices(engine: string) {
+      if (!voiceSelect) return;
+      voiceSelect.innerHTML = '';
+      const list = engine === 'kokoro' ? KOKORO_VOICES : SPEECHT5_VOICES;
+      list.forEach((v) => {
+        const opt = document.createElement('option');
+        opt.value = v.id;
+        opt.textContent = v.label;
+        voiceSelect.appendChild(opt);
+      });
+    }
+
+    engineSelect?.addEventListener('change', () => {
+      const engine = engineSelect.value;
+      populateVoices(engine);
+      if (engine === 'kokoro') {
+        if (engineDesc) engineDesc.textContent = 'Kokoro: State-of-the-art 82M model with lifelike human inflections & emotion.';
+        if (sizeBadge) sizeBadge.textContent = 'Download: ~90 MB';
+        if (btnRunTtsText && !btnRunTts?.hasAttribute('disabled')) btnRunTtsText.textContent = 'Synthesize Audio (~90MB)';
+      } else {
+        if (engineDesc) engineDesc.textContent = 'SpeechT5: Classic compact model conditioning on 512-dim speaker vectors.';
+        if (sizeBadge) sizeBadge.textContent = 'Download: ~35 MB';
+        if (btnRunTtsText && !btnRunTts?.hasAttribute('disabled')) btnRunTtsText.textContent = 'Synthesize Audio (~35MB)';
+      }
+    });
+
+    // Initialize default voices
+    populateVoices('kokoro');
+
+    btnRunTts?.addEventListener('click', async () => {
+      const text = ttsInput?.value.trim();
+      if (!text) return;
+
+      const engine = engineSelect?.value || 'kokoro';
+      btnRunTts.setAttribute('disabled', 'true');
+      btnRunTts.classList.add('opacity-60');
+      const startTime = performance.now();
+
+      try {
+        let audioBlob: Blob;
+
+        if (engine === 'kokoro') {
+          const { KokoroTTS } = await getKokoroModule();
+
+          if (!kokoroInstance) {
+            ttsProgress?.classList.remove('hidden');
+            if (ttsStatus) ttsStatus.textContent = 'Downloading Kokoro-82M (~90MB)...';
+
+            const hasWebGpu = 'gpu' in navigator;
+            kokoroInstance = await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX', {
+              dtype: 'q8',
+              device: hasWebGpu ? 'webgpu' : 'wasm',
+              progress_callback: (p: any) => {
+                if (p.status === 'progress' && p.total > 0) {
+                  const pct = Math.round((p.loaded / p.total) * 100);
+                  if (ttsPercent) ttsPercent.textContent = `${pct}%`;
+                  if (ttsBar) ttsBar.style.width = `${pct}%`;
+                  if (ttsStatus) ttsStatus.textContent = `Downloading ${p.file} (${pct}%)...`;
+                }
+              }
+            });
+
+            ttsProgress?.classList.add('hidden');
+            await updateStorageEstimate();
+          }
+
+          if (btnRunTtsText) btnRunTtsText.textContent = 'Synthesizing voice...';
+          const selectedVoice = voiceSelect?.value || 'af_heart';
+          const rawAudio = await kokoroInstance.generate(text, { voice: selectedVoice });
+
+          if (typeof rawAudio.toBlob === 'function') {
+            audioBlob = await rawAudio.toBlob();
+          } else {
+            const samples = rawAudio.audio || rawAudio.data;
+            const rate = rawAudio.sampling_rate || 24000;
+            audioBlob = audioDataToWav(samples, rate);
+          }
+
+        } else {
+          // SpeechT5
+          const { pipeline } = await getTransformers();
+
+          if (!speecht5Pipeline) {
+            ttsProgress?.classList.remove('hidden');
+            if (ttsStatus) ttsStatus.textContent = 'Downloading SpeechT5 (~35MB)...';
+
+            speecht5Pipeline = await pipeline('text-to-speech', 'Xenova/speecht5_tts', {
+              quantized: true,
+              progress_callback: (p: any) => {
+                if (p.status === 'progress' && p.total > 0) {
+                  const pct = Math.round((p.loaded / p.total) * 100);
+                  if (ttsPercent) ttsPercent.textContent = `${pct}%`;
+                  if (ttsBar) ttsBar.style.width = `${pct}%`;
+                  if (ttsStatus) ttsStatus.textContent = `Downloading ${p.file} (${pct}%)...`;
+                }
+              }
+            });
+
+            ttsProgress?.classList.add('hidden');
+            await updateStorageEstimate();
+          }
+
+          if (btnRunTtsText) btnRunTtsText.textContent = 'Synthesizing voice...';
+          const speaker_embeddings = voiceSelect?.value || SPEECHT5_VOICES[0].id;
+          const result = await speecht5Pipeline(text, { speaker_embeddings });
+          audioBlob = audioDataToWav(result.audio, result.sampling_rate || 16000);
+        }
+
+        const elapsedSec = ((performance.now() - startTime) / 1000).toFixed(2);
+        const audioUrl = URL.createObjectURL(audioBlob);
+
+        if (ttsPlayer) {
+          ttsPlayer.src = audioUrl;
+          ttsPlayer.play();
+        }
+        if (ttsTimer) {
+          ttsTimer.textContent = `Synthesized in ${elapsedSec}s`;
+        }
+        ttsContainer?.classList.remove('hidden');
+
+      } catch (err: any) {
+        console.error('TTS error:', err);
+        alert(`TTS Error: ${err?.message || err}`);
+      } finally {
+        btnRunTts.removeAttribute('disabled');
+        btnRunTts.classList.remove('opacity-60');
+        if (btnRunTtsText) btnRunTtsText.textContent = 'Synthesize Again';
+        await updateStorageEstimate();
+      }
+    });
+
+    // Helper: float32 audio to wav Blob
+    function audioDataToWav(samples: Float32Array, sampleRate: number): Blob {
+      const buffer = new ArrayBuffer(44 + samples.length * 2);
+      const view = new DataView(buffer);
+
+      function writeString(view: DataView, offset: number, string: string) {
+        for (let i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+        }
+      }
+
+      writeString(view, 0, 'RIFF');
+      view.setUint32(4, 36 + samples.length * 2, true);
+      writeString(view, 8, 'WAVE');
+      writeString(view, 12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeString(view, 36, 'data');
+      view.setUint32(40, samples.length * 2, true);
+
+      let offset = 44;
+      for (let i = 0; i < samples.length; i++, offset += 2) {
+        const s = Math.max(-1, Math.min(1, samples[i]));
+        view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+
+      return new Blob([view], { type: 'audio/wav' });
+    }
+  }
+
+  setupAiPlayground();
+  document.addEventListener('astro:after-swap', setupAiPlayground);
+</script>

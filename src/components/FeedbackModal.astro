@@ -1,0 +1,242 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+}
+
+const { slug, title } = Astro.props;
+---
+
+<!-- Trigger Button in Article / Floating Footer -->
+<div id="feedback-modal-backdrop" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 animate-in fade-in duration-150">
+  <div
+    id="feedback-modal-card"
+    class="w-full max-w-lg rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-2xl p-6 sm:p-8 space-y-5 animate-in zoom-in-95 duration-150 relative max-h-[90vh] overflow-y-auto"
+  >
+    <div class="flex items-start justify-between">
+      <div>
+        <h3 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+          Share Your Feedback
+        </h3>
+        <p class="text-xs text-neutral-500 dark:text-neutral-400 italic mt-1">
+          Please select quick feedback or write a custom message (or both!)
+        </p>
+      </div>
+      <button
+        type="button"
+        id="btn-close-feedback-x"
+        class="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 p-1 text-lg font-bold"
+        aria-label="Close"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Success Message Container -->
+    <div id="feedback-success-state" class="hidden py-8 text-center space-y-3">
+      <div class="w-12 h-12 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200 dark:border-emerald-800">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h4 class="text-lg font-bold text-neutral-900 dark:text-white">Thank you!</h4>
+      <p class="text-xs text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto">
+        Your feedback has been received and helps make these articles even better.
+      </p>
+      <button
+        type="button"
+        id="btn-feedback-done"
+        class="mt-4 px-5 py-2 text-xs font-semibold rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:opacity-90"
+      >
+        Done
+      </button>
+    </div>
+
+    <!-- Main Feedback Form -->
+    <form id="feedback-form" class="space-y-4" data-slug={slug} data-title={title}>
+      <!-- Quick Feedback Checkboxes -->
+      <div>
+        <label class="block text-xs font-semibold text-neutral-900 dark:text-neutral-200 mb-2.5">
+          Quick feedback
+        </label>
+        <div class="space-y-2 text-xs text-neutral-700 dark:text-neutral-300">
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <input type="checkbox" name="quick" value="Not what I was looking for" class="w-4 h-4 rounded border-neutral-300 text-sky-600 focus:ring-sky-500/30" />
+            <span>Not what I was looking for</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <input type="checkbox" name="quick" value="A bit confusing" class="w-4 h-4 rounded border-neutral-300 text-sky-600 focus:ring-sky-500/30" />
+            <span>A bit confusing</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <input type="checkbox" name="quick" value="Please improve English" class="w-4 h-4 rounded border-neutral-300 text-sky-600 focus:ring-sky-500/30" />
+            <span>Please improve English</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <input type="checkbox" name="quick" value="Not as interesting as hoped" class="w-4 h-4 rounded border-neutral-300 text-sky-600 focus:ring-sky-500/30" />
+            <span>Not as interesting as hoped</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <input type="checkbox" name="quick" value="I liked it!" class="w-4 h-4 rounded border-neutral-300 text-sky-600 focus:ring-sky-500/30" />
+            <span>I liked it!</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Custom message -->
+      <div>
+        <label for="feedback-custom-message" class="block text-xs font-semibold text-neutral-900 dark:text-neutral-200 mb-1">
+          Custom message
+        </label>
+        <textarea
+          id="feedback-custom-message"
+          name="customMessage"
+          rows="3"
+          placeholder="Share your thoughts..."
+          class="w-full px-3.5 py-2 text-xs rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30"
+        ></textarea>
+      </div>
+
+      <!-- Name (optional) -->
+      <div>
+        <label for="feedback-name" class="block text-xs font-semibold text-neutral-900 dark:text-neutral-200 mb-1">
+          Name (optional)
+        </label>
+        <input
+          type="text"
+          id="feedback-name"
+          name="name"
+          placeholder="Your name"
+          class="w-full px-3.5 py-2 text-xs rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30"
+        />
+      </div>
+
+      <!-- Email (optional) -->
+      <div>
+        <label for="feedback-email" class="block text-xs font-semibold text-neutral-900 dark:text-neutral-200 mb-1">
+          Email (optional)
+        </label>
+        <input
+          type="email"
+          id="feedback-email"
+          name="email"
+          placeholder="your@email.com"
+          class="w-full px-3.5 py-2 text-xs rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30"
+        />
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-2.5 pt-2">
+        <button
+          type="button"
+          id="btn-close-feedback-bottom"
+          class="px-4 py-2 text-xs font-semibold rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 transition-colors"
+        >
+          Close
+        </button>
+        <button
+          type="submit"
+          id="btn-submit-feedback"
+          class="px-5 py-2 text-xs font-semibold rounded-xl bg-sky-600 hover:bg-sky-500 text-white shadow-sm shadow-sky-600/20 active:scale-95 transition-all"
+        >
+          Send Feedback
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function initFeedbackModal() {
+    const backdrop = document.getElementById('feedback-modal-backdrop');
+    const form = document.getElementById('feedback-form') as HTMLFormElement;
+    const successState = document.getElementById('feedback-success-state');
+    const btnCloseX = document.getElementById('btn-close-feedback-x');
+    const btnCloseBottom = document.getElementById('btn-close-feedback-bottom');
+    const btnDone = document.getElementById('btn-feedback-done');
+    const submitBtn = document.getElementById('btn-submit-feedback') as HTMLButtonElement;
+
+    function openModal() {
+      if (!backdrop) return;
+      backdrop.classList.remove('hidden');
+      backdrop.classList.add('flex');
+      if (form) form.classList.remove('hidden');
+      if (successState) successState.classList.add('hidden');
+    }
+
+    function closeModal() {
+      if (!backdrop) return;
+      backdrop.classList.add('hidden');
+      backdrop.classList.remove('flex');
+    }
+
+    // Attach trigger listeners
+    document.querySelectorAll('.open-feedback-trigger').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal();
+      });
+    });
+
+    btnCloseX?.addEventListener('click', closeModal);
+    btnCloseBottom?.addEventListener('click', closeModal);
+    btnDone?.addEventListener('click', closeModal);
+
+    backdrop?.addEventListener('click', (e) => {
+      if (e.target === backdrop) closeModal();
+    });
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const slug = form.getAttribute('data-slug') || '';
+      const title = form.getAttribute('data-title') || '';
+
+      const checkedQuick = Array.from(
+        form.querySelectorAll('input[name="quick"]:checked')
+      ).map((el) => (el as HTMLInputElement).value);
+
+      const customMessage = (form.querySelector('textarea[name="customMessage"]') as HTMLTextAreaElement)?.value || '';
+      const name = (form.querySelector('input[name="name"]') as HTMLInputElement)?.value || '';
+      const email = (form.querySelector('input[name="email"]') as HTMLInputElement)?.value || '';
+
+      if (checkedQuick.length === 0 && !customMessage.trim()) {
+        alert('Please choose a quick feedback option or write a short note.');
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+      }
+
+      try {
+        const res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slug,
+            title,
+            quickFeedback: checkedQuick,
+            customMessage,
+            name,
+            email,
+          }),
+        });
+
+        if (!res.ok) throw new Error('Submission failed');
+
+        form.reset();
+        if (form) form.classList.add('hidden');
+        if (successState) successState.classList.remove('hidden');
+      } catch (err: any) {
+        alert('Could not submit feedback: ' + err.message);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send Feedback';
+        }
+      }
+    });
+  }
+
+  initFeedbackModal();
+  document.addEventListener('astro:after-swap', initFeedbackModal);
+</script>

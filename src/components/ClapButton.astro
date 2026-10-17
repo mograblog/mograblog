@@ -1,0 +1,204 @@
+---
+interface Props {
+  slug: string;
+  variant?: 'inline' | 'card';
+}
+
+const { slug, variant = 'inline' } = Astro.props;
+---
+
+{variant === 'inline' ? (
+  <!-- Inline Compact Clap Button for Meta Header -->
+  <button
+    type="button"
+    class="clap-btn-trigger inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-neutral-600 dark:text-neutral-300 hover:text-amber-600 dark:hover:text-amber-400 bg-neutral-100 dark:bg-neutral-800/80 hover:bg-amber-50 dark:hover:bg-amber-950/40 border border-transparent hover:border-amber-200 dark:hover:border-amber-800/50 transition-all active:scale-95 group relative"
+    data-slug={slug}
+    aria-label="Applaud this article"
+  >
+    <span class="clap-icon text-sm transition-transform duration-200 group-hover:scale-125 select-none">👏</span>
+    <span class="clap-count font-semibold text-neutral-700 dark:text-neutral-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">0</span>
+    <span class="clap-bubble-container absolute -top-8 left-1/2 -translate-x-1/2 pointer-events-none"></span>
+  </button>
+) : (
+  <!-- Compact Button & Stats for Unified Footer Bar -->
+  <div class="flex items-center gap-2.5">
+    <button
+      type="button"
+      class="clap-btn-trigger relative w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-tr from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/30 border border-amber-200/80 dark:border-amber-800/60 text-amber-600 dark:text-amber-400 hover:scale-105 active:scale-90 transition-all shadow-sm group cursor-pointer flex-shrink-0"
+      data-slug={slug}
+      aria-label="Applaud this article"
+    >
+      <span class="clap-icon text-base transition-transform duration-150 group-hover:scale-125 select-none">👏</span>
+      <span class="clap-bubble-container absolute -top-8 left-1/2 -translate-x-1/2 pointer-events-none"></span>
+    </button>
+    <div>
+      <div class="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5 leading-none">
+        <span>Claps</span>
+        <span class="clap-user-badge hidden px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+          <span class="clap-user-count">0</span>×
+        </span>
+      </div>
+      <div class="text-[11px] text-neutral-400 mt-1 leading-none">
+        <span class="clap-count font-semibold text-neutral-700 dark:text-neutral-300">0</span> total
+      </div>
+    </div>
+  </div>
+)}
+
+<script>
+  function setupClapButtons() {
+    const clapButtons = document.querySelectorAll('.clap-btn-trigger');
+    if (!clapButtons.length) return;
+
+    // Track state per slug
+    const slugMap = new Map<string, { total: number; user: number; pendingIncrement: number; syncTimer: any }>();
+
+    clapButtons.forEach((btn) => {
+      const slug = btn.getAttribute('data-slug');
+      if (!slug) return;
+
+      if (!slugMap.has(slug)) {
+        const storedUser = Number(localStorage.getItem(`claps_user_${slug}`) || 0);
+        slugMap.set(slug, {
+          total: 0,
+          user: storedUser,
+          pendingIncrement: 0,
+          syncTimer: null,
+        });
+
+        // Initial fetch
+        fetch(`/api/claps?slug=${encodeURIComponent(slug)}`)
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (data && typeof data.claps === 'number') {
+              const state = slugMap.get(slug);
+              if (state) {
+                state.total = data.claps;
+                updateAllClapViews(slug);
+              }
+            }
+          })
+          .catch(() => {});
+      }
+
+      updateAllClapViews(slug);
+
+      btn.addEventListener('click', () => {
+        handleClapClick(slug, btn);
+      });
+    });
+
+    function handleClapClick(slug: string, btnElement: Element) {
+      const state = slugMap.get(slug);
+      if (!state) return;
+
+      // Max 50 claps per reader
+      if (state.user >= 50) {
+        showMaxClapTooltip(btnElement);
+        return;
+      }
+
+      state.user += 1;
+      state.total += 1;
+      state.pendingIncrement += 1;
+      localStorage.setItem(`claps_user_${slug}`, String(state.user));
+
+      spawnFloatingClapBubble(btnElement, `+${state.pendingIncrement}`);
+      updateAllClapViews(slug);
+
+      // Debounce server sync (600ms batch)
+      if (state.syncTimer) clearTimeout(state.syncTimer);
+      state.syncTimer = setTimeout(() => {
+        const countToSend = state.pendingIncrement;
+        state.pendingIncrement = 0;
+        if (countToSend > 0) {
+          fetch('/api/claps', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slug, count: countToSend }),
+          })
+            .then((r) => (r.ok ? r.json() : null))
+            .then((data) => {
+              if (data && typeof data.claps === 'number') {
+                state.total = data.claps;
+                updateAllClapViews(slug);
+              }
+            })
+            .catch(() => {});
+        }
+      }, 600);
+    }
+
+    function updateAllClapViews(slug: string) {
+      const state = slugMap.get(slug);
+      if (!state) return;
+
+      // Update all counters on page
+      document.querySelectorAll(`.clap-btn-trigger[data-slug="${slug}"]`).forEach((btn) => {
+        const countSpan = btn.querySelector('.clap-count');
+        if (countSpan) countSpan.textContent = formatClapsNumber(state.total);
+      });
+
+      document.querySelectorAll('.clap-count').forEach((el) => {
+        const parentBtn = el.closest(`[data-slug="${slug}"]`);
+        if (!parentBtn) {
+          el.textContent = formatClapsNumber(state.total);
+        }
+      });
+
+      // Update user badge in card
+      const userBadge = document.querySelector('.clap-user-badge');
+      const userCountSpan = document.querySelector('.clap-user-count');
+      if (userBadge && userCountSpan) {
+        if (state.user > 0) {
+          userBadge.classList.remove('hidden');
+          userBadge.classList.add('inline-flex');
+          userCountSpan.textContent = String(state.user);
+        }
+      }
+    }
+
+    function spawnFloatingClapBubble(btn: Element, text: string) {
+      const container = btn.querySelector('.clap-bubble-container');
+      if (!container) return;
+
+      const bubble = document.createElement('div');
+      bubble.className = 'clap-bubble absolute px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-white shadow-md transition-all duration-700 ease-out select-none transform translate-y-0 opacity-100 scale-100 pointer-events-none';
+      bubble.textContent = text;
+      container.appendChild(bubble);
+
+      // Animate up and fade out
+      requestAnimationFrame(() => {
+        bubble.style.transform = 'translateY(-28px) scale(1.15)';
+        bubble.style.opacity = '0';
+      });
+
+      setTimeout(() => {
+        bubble.remove();
+      }, 750);
+    }
+
+    function showMaxClapTooltip(btn: Element) {
+      const container = btn.querySelector('.clap-bubble-container');
+      if (!container) return;
+
+      const tooltip = document.createElement('div');
+      tooltip.className = 'absolute -top-7 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-md whitespace-nowrap animate-bounce';
+      tooltip.textContent = 'Max claps reached (50)! 🙏';
+      container.appendChild(tooltip);
+
+      setTimeout(() => {
+        tooltip.remove();
+      }, 1800);
+    }
+
+    function formatClapsNumber(num: number): string {
+      if (!num || isNaN(num)) return '0';
+      if (num >= 1000) return `${(num / 1000).toFixed(1).replace('.0', '')}k`;
+      return String(num);
+    }
+  }
+
+  setupClapButtons();
+  document.addEventListener('astro:after-swap', setupClapButtons);
+</script>

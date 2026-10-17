@@ -4,6 +4,8 @@ published: 2011-05-30T03:47:00.000-07:00
 description: using pickle in python
 keywords: python, pickle
 layout: post.pug
+cover: /style/images/memes/toilet-lid-backwards.jpg
+coverTitle: Design Flaws - Backwards Implementation
 ---
 
 I recently learned how to write to a file in Python, and among it how to use Object Serialization library called "pickle".  

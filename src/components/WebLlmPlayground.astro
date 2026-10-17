@@ -1,0 +1,395 @@
+---
+---
+
+<!-- WEBLM INTERACTIVE PLAYGROUND -->
+<div id="webllm-card" class="not-prose my-8 p-5 sm:p-7 rounded-2xl border border-indigo-500/30 bg-gradient-to-b from-indigo-50/60 to-white dark:from-neutral-900 dark:to-neutral-950 shadow-xl backdrop-blur">
+  <!-- Top Bar: Header & Cache Manager -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200 dark:border-neutral-800">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 uppercase tracking-wider">Live WebLLM Engine</span>
+        <h3 class="text-base sm:text-lg font-bold text-neutral-900 dark:text-white m-0">In-Browser GPU Language Model</h3>
+      </div>
+      <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 mb-0">
+        Run state-of-the-art models like Llama 3.2 directly on your graphics card via WebGPU.
+      </p>
+    </div>
+
+    <!-- Storage Manager & Purge Button -->
+    <div class="flex items-center gap-2 self-start sm:self-auto bg-neutral-100 dark:bg-neutral-800/80 px-2.5 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700">
+      <div class="flex flex-col text-left">
+        <span class="text-[9px] uppercase font-bold text-neutral-400 dark:text-neutral-500 tracking-wider">Cached</span>
+        <span id="webllm-storage-usage" class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">Checking...</span>
+      </div>
+      <div class="w-px h-5 bg-neutral-200 dark:border-neutral-700 mx-0.5"></div>
+      <button
+        type="button"
+        id="btn-webllm-purge"
+        class="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-semibold rounded-lg bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-950/40 dark:hover:bg-red-900/60 dark:text-red-400 border border-red-200 dark:border-red-900/50 transition-colors cursor-pointer"
+        title="Delete downloaded WebLLM model weights from browser cache"
+      >
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        <span>Purge</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- WebGPU Compatibility Alert (Hidden if WebGPU is available) -->
+  <div id="webllm-no-gpu-banner" class="hidden my-4 p-4 rounded-xl border border-amber-500/40 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 text-xs leading-relaxed">
+    <div class="flex items-start gap-2.5">
+      <svg class="w-5 h-5 flex-shrink-0 text-amber-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <div>
+        <strong class="font-bold">WebGPU Not Detected:</strong> WebLLM strictly requires hardware-accelerated WebGPU to run. Please visit on a WebGPU-enabled desktop browser (e.g. modern Google Chrome, Microsoft Edge, Brave, or Safari 18+ on macOS) with hardware acceleration enabled in settings.
+      </div>
+    </div>
+  </div>
+
+  <!-- Model Selector Dropdown -->
+  <div class="mt-4 p-3.5 rounded-xl border border-indigo-500/20 bg-indigo-50/40 dark:bg-indigo-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+    <div class="flex-1">
+      <label for="webllm-model-select" class="block font-bold text-indigo-900 dark:text-indigo-300 mb-1.5">
+        Choose Model:
+      </label>
+      <select
+        id="webllm-model-select"
+        class="w-full sm:w-auto text-xs font-semibold p-2 pr-8 rounded-lg border border-indigo-300 dark:border-indigo-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+      >
+        <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC" data-size="~880 MB" data-desc="Llama 3.2 (1B) - Meta's compact instruction model. Fast, responsive, and great for general chat." selected>
+          🧠 Llama 3.2 (1B) — Fast & Responsive (~880 MB) [Recommended]
+        </option>
+        <option value="Llama-3.2-3B-Instruct-q4f16_1-MLC" data-size="~2.1 GB" data-desc="Llama 3.2 (3B) - Genuinely smart reasoning, coding, and creative writing. High-memory desktop recommended.">
+          🚀 Llama 3.2 (3B) — Powerhouse Smart (~2.1 GB) [Desktop Only]
+        </option>
+        <option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC" data-size="~1.2 GB" data-desc="Qwen 2.5 (1.5B) - Excellent reasoning, structured answers, and multilingual fluency.">
+          ⚡ Qwen 2.5 (1.5B) — Sharp & Structured (~1.2 GB)
+        </option>
+        <option value="SmolLM2-360M-Instruct-q4f16_1-MLC" data-size="~250 MB" data-desc="SmolLM2 (360M) - Ultra-lightweight option. Fast download for quick testing.">
+          🪶 SmolLM2 (360M) — Quick Test (~250 MB)
+        </option>
+      </select>
+      <p id="webllm-model-desc" class="text-neutral-500 dark:text-neutral-400 m-0 mt-1.5 text-[11.5px] leading-normal">
+        Llama 3.2 (1B) - Meta's compact instruction model. Fast, responsive, and great for general chat.
+      </p>
+    </div>
+    <span id="webllm-model-badge" class="px-2.5 py-1 rounded-lg font-bold bg-white dark:bg-neutral-800 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex-shrink-0 self-start sm:self-center">
+      Download: ~880 MB
+    </span>
+  </div>
+
+  <!-- Download Progress Indicator -->
+  <div id="webllm-progress-container" class="hidden my-4 p-4 rounded-xl border border-indigo-500/30 bg-indigo-50 dark:bg-indigo-950/40">
+    <div class="flex items-center justify-between text-xs font-semibold text-indigo-900 dark:text-indigo-300 mb-2">
+      <span id="webllm-progress-status">Downloading model weights to GPU memory...</span>
+      <span id="webllm-progress-percent">0%</span>
+    </div>
+    <div class="w-full h-2 rounded-full bg-indigo-200 dark:bg-indigo-900/60 overflow-hidden">
+      <div id="webllm-progress-bar" class="h-full bg-indigo-500 rounded-full transition-all duration-300 w-0"></div>
+    </div>
+    <p id="webllm-progress-subtext" class="text-[11px] text-indigo-700/70 dark:text-indigo-300/70 mt-2 m-0 truncate">
+      Initializing shaders and WebGPU buffers...
+    </p>
+  </div>
+
+  <!-- Prompt Input & Controls -->
+  <div class="space-y-3 mt-4">
+    <div>
+      <label class="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+        Prompt:
+      </label>
+      <textarea
+        id="webllm-prompt-input"
+        rows="2"
+        class="w-full text-sm p-3 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        placeholder="Ask a question (e.g. 'Explain how WebGPU works to a 10-year-old')"
+      >Explain how WebGPU works to a 10-year-old in 2 short paragraphs.</textarea>
+    </div>
+
+    <div class="flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span class="text-xs text-neutral-400">Presets:</span>
+        <button type="button" class="webllm-preset-btn px-2 py-0.5 text-xs rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-indigo-500 text-neutral-600 dark:text-neutral-300" data-text="Explain how WebGPU works to a 10-year-old in 2 short paragraphs.">
+          💡 WebGPU for Kids
+        </button>
+        <button type="button" class="webllm-preset-btn px-2 py-0.5 text-xs rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-indigo-500 text-neutral-600 dark:text-neutral-300" data-text="Write a clean JavaScript function that removes duplicate objects from an array by an 'id' key.">
+          💻 Clean JS Code
+        </button>
+        <button type="button" class="webllm-preset-btn px-2 py-0.5 text-xs rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-indigo-500 text-neutral-600 dark:text-neutral-300" data-text="A farmer needs to cross a river with a fox, a chicken, and a bag of grain. How does he do it safely?">
+          🦊 River Riddle
+        </button>
+      </div>
+
+      <button
+        type="button"
+        id="btn-run-webllm"
+        class="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md active:scale-95 transition-all cursor-pointer"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+        <span id="btn-run-webllm-text">Generate with WebLLM (~880MB)</span>
+      </button>
+    </div>
+
+    <!-- Output Box with Streaming Display -->
+    <div class="mt-4">
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-xs font-semibold text-neutral-500 dark:text-neutral-400">Streamed Local Response:</span>
+        <span id="webllm-metrics" class="text-[11px] font-mono text-neutral-400">Ready</span>
+      </div>
+      <div
+        id="webllm-output-box"
+        class="min-h-[100px] p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/60 text-sm font-sans text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap leading-relaxed transition-all"
+      >Click "Generate" above to initialize WebLLM and stream tokens directly on your GPU.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Dynamic Relocation: Move WebLLM card into the markdown placeholder
+  function mountWebLlmCard() {
+    const card = document.getElementById('webllm-card');
+    const mountPoint = document.getElementById('live-webllm-mount');
+    if (card && mountPoint) {
+      mountPoint.replaceWith(card);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountWebLlmCard);
+  } else {
+    mountWebLlmCard();
+  }
+
+  // Storage calculation & purge
+  async function updateStorageDisplay() {
+    const textEl = document.getElementById('webllm-storage-usage');
+    if (!textEl) return;
+
+    if (navigator.storage && navigator.storage.estimate) {
+      try {
+        const estimate = await navigator.storage.estimate();
+        const usageMB = Math.round((estimate.usage || 0) / (1024 * 1024));
+        textEl.textContent = usageMB > 0 ? `${usageMB} MB` : '0 MB';
+      } catch (err) {
+        textEl.textContent = 'Active';
+      }
+    } else {
+      textEl.textContent = 'Active';
+    }
+  }
+
+  async function purgeWebLlmStorage() {
+    const btn = document.getElementById('btn-webllm-purge');
+    const textEl = document.getElementById('webllm-storage-usage');
+    if (btn) btn.disabled = true;
+
+    try {
+      // Clear WebLLM cache storage
+      if (window.caches) {
+        const keys = await caches.keys();
+        for (const key of keys) {
+          if (key.toLowerCase().includes('webllm') || key.toLowerCase().includes('mlc')) {
+            await caches.delete(key);
+          }
+        }
+      }
+
+      // Clear IndexedDB databases created by WebLLM
+      if (window.indexedDB && indexedDB.databases) {
+        const dbs = await indexedDB.databases();
+        for (const db of dbs) {
+          if (db.name && (db.name.includes('webllm') || db.name.includes('tvm') || db.name.includes('mlc'))) {
+            indexedDB.deleteDatabase(db.name);
+          }
+        }
+      }
+
+      // Reset loaded engine reference
+      loadedEngine = null;
+      loadedModelId = null;
+
+      if (textEl) textEl.textContent = '0 MB';
+      alert('WebLLM model weights and cache have been successfully cleared from browser storage!');
+      await updateStorageDisplay();
+    } catch (err) {
+      console.warn('Storage purge error:', err);
+      alert('Cache cleared.');
+      await updateStorageDisplay();
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  // State Management
+  let loadedEngine: any = null;
+  let loadedModelId: string | null = null;
+  let isGenerating = false;
+
+  // Check WebGPU availability
+  function checkWebGpu() {
+    const hasWebGpu = typeof navigator !== 'undefined' && 'gpu' in navigator && !!(navigator as any).gpu;
+    const banner = document.getElementById('webllm-no-gpu-banner');
+    const runBtn = document.getElementById('btn-run-webllm');
+    if (!hasWebGpu) {
+      if (banner) banner.classList.remove('hidden');
+      if (runBtn) {
+        runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+    return hasWebGpu;
+  }
+
+  // Update UI on dropdown change
+  const modelSelect = document.getElementById('webllm-model-select') as HTMLSelectElement | null;
+  const modelBadge = document.getElementById('webllm-model-badge');
+  const modelDesc = document.getElementById('webllm-model-desc');
+  const runBtnText = document.getElementById('btn-run-webllm-text');
+
+  modelSelect?.addEventListener('change', () => {
+    const selectedOption = modelSelect.selectedOptions[0];
+    const size = selectedOption.getAttribute('data-size') || '';
+    const desc = selectedOption.getAttribute('data-desc') || '';
+    if (modelBadge) modelBadge.textContent = `Download: ${size}`;
+    if (modelDesc) modelDesc.textContent = desc;
+    if (runBtnText) runBtnText.textContent = `Generate with WebLLM (${size})`;
+  });
+
+  // Presets
+  document.querySelectorAll('.webllm-preset-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const text = btn.getAttribute('data-text');
+      const input = document.getElementById('webllm-prompt-input') as HTMLTextAreaElement | null;
+      if (input && text) {
+        input.value = text;
+        input.focus();
+      }
+    });
+  });
+
+  // Purge button listener
+  document.getElementById('btn-webllm-purge')?.addEventListener('click', purgeWebLlmStorage);
+
+  // Main Generation Logic
+  document.getElementById('btn-run-webllm')?.addEventListener('click', async () => {
+    if (isGenerating) return;
+
+    if (!checkWebGpu()) {
+      alert('WebGPU is not supported or enabled on your current browser. Please use Chrome, Edge, Brave, or Safari 18+ on macOS.');
+      return;
+    }
+
+    const selectedModel = modelSelect?.value || 'Llama-3.2-1B-Instruct-q4f16_1-MLC';
+    const promptInput = document.getElementById('webllm-prompt-input') as HTMLTextAreaElement | null;
+    const prompt = promptInput?.value.trim() || 'Explain WebGPU in simple terms.';
+    
+    const outputBox = document.getElementById('webllm-output-box');
+    const metricsEl = document.getElementById('webllm-metrics');
+    const runBtn = document.getElementById('btn-run-webllm') as HTMLButtonElement | null;
+    const progressContainer = document.getElementById('webllm-progress-container');
+    const progressStatus = document.getElementById('webllm-progress-status');
+    const progressPercent = document.getElementById('webllm-progress-percent');
+    const progressBar = document.getElementById('webllm-progress-bar') as HTMLElement | null;
+    const progressSubtext = document.getElementById('webllm-progress-subtext');
+
+    isGenerating = true;
+    if (runBtn) {
+      runBtn.disabled = true;
+      runBtn.classList.add('opacity-70', 'cursor-not-allowed');
+    }
+
+    try {
+      // 1. Check if we need to load or switch the model
+      if (!loadedEngine || loadedModelId !== selectedModel) {
+        if (progressContainer) progressContainer.classList.remove('hidden');
+        if (outputBox) outputBox.innerText = 'Loading WebLLM runtime and model weights into GPU memory...';
+        if (metricsEl) metricsEl.innerText = 'Downloading model...';
+
+        // Dynamic import WebLLM from CDN
+        // @ts-ignore
+        const webllm = await import('https://esm.run/@mlc-ai/web-llm');
+
+        const initProgressCallback = (report: any) => {
+          const percent = Math.round((report.progress || 0) * 100);
+          if (progressPercent) progressPercent.innerText = `${percent}%`;
+          if (progressBar) progressBar.style.width = `${percent}%`;
+          if (progressStatus) progressStatus.innerText = report.text || 'Loading weights...';
+          if (progressSubtext) progressSubtext.innerText = report.text || '';
+          if (metricsEl) metricsEl.innerText = `Loading: ${percent}%`;
+        };
+
+        loadedEngine = await webllm.CreateMLCEngine(selectedModel, {
+          initProgressCallback: initProgressCallback
+        });
+        loadedModelId = selectedModel;
+
+        if (progressContainer) progressContainer.classList.add('hidden');
+        await updateStorageDisplay();
+      }
+
+      // 2. Stream Chat Completion
+      if (outputBox) outputBox.innerText = '';
+      if (metricsEl) metricsEl.innerText = 'Generating tokens...';
+
+      const startTime = performance.now();
+      let tokenCount = 0;
+      let fullResponse = '';
+
+      const chunks = await loadedEngine.chat.completions.create({
+        messages: [
+          { role: 'system', content: 'You are a friendly, helpful, and concise AI assistant running 100% locally in the user\'s web browser via WebGPU.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 350,
+        stream: true
+      });
+
+      for await (const chunk of chunks) {
+        const delta = chunk.choices[0]?.delta?.content || '';
+        if (delta) {
+          fullResponse += delta;
+          tokenCount++;
+          if (outputBox) {
+            outputBox.innerText = fullResponse;
+          }
+
+          const elapsedSec = (performance.now() - startTime) / 1000;
+          const tokPerSec = elapsedSec > 0 ? (tokenCount / elapsedSec).toFixed(1) : '0';
+          if (metricsEl) {
+            metricsEl.innerText = `${tokPerSec} tokens/sec (${tokenCount} tokens)`;
+          }
+        }
+      }
+
+      const totalElapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+      const finalTokPerSec = (tokenCount / parseFloat(totalElapsed)).toFixed(1);
+      if (metricsEl) {
+        metricsEl.innerText = `Done: ${finalTokPerSec} tok/s · ${tokenCount} tokens in ${totalElapsed}s`;
+      }
+
+      await updateStorageDisplay();
+
+    } catch (err: any) {
+      console.error('WebLLM generation error:', err);
+      if (outputBox) {
+        outputBox.innerText = `⚠️ Error running WebLLM: ${err?.message || err}\n\nNote: WebLLM requires a browser with WebGPU enabled (Chrome 113+, Edge 113+, Safari 18+). If you're on a laptop with integrated graphics or low memory, try the smaller SmolLM2 (360M) model.`;
+      }
+      if (metricsEl) metricsEl.innerText = 'Error';
+    } finally {
+      isGenerating = false;
+      if (runBtn) {
+        runBtn.disabled = false;
+        runBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+      }
+      if (progressContainer) progressContainer.classList.add('hidden');
+    }
+  });
+
+  // Check WebGPU & storage on initial load
+  checkWebGpu();
+  updateStorageDisplay();
+</script>

@@ -6,8 +6,10 @@ keywords: imagemagick
 layout: post.pug
 ---
 
+> [!NOTE]
+> **Update:** Technology has come a long way since this 2013 bash script! For modern background removal using neural networks (`rembg`, WebGPU, and macOS Quick Actions), check out the new guide: **[Removing Backgrounds from Images: From ImageMagick Hacks to Modern AI](/2026/09/removing-backgrounds-from-images-imagemagick-to-modern-ai)**.
 
-A long time ago I wrote a post about [how to remove background from images using 2 simple commands with imagemagick.](/2012/01/removing-backgrounds-from-images-with-2-commands-and-a-freeware.html "how to remove background from images")
+A long time ago I wrote a post about [how to remove background from images using 2 simple commands with imagemagick.](/2012/01/removing-backgrounds-from-images-with-2-commands-and-a-freeware "how to remove background from images")
 Recently, I acquired a new computer, and I had to download imagemagick again.  
 Obviously, I went to my blog to remember the commands I used, and I copy-pasted them, only to discover they do not work!  
 
