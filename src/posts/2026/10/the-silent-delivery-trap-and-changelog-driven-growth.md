@@ -87,8 +87,8 @@ If an engineer tries your product today, finds that one key feature is missing o
 
 This is where **Changelog-Led Growth** completes the picture:
 
-* **PLG is the product's state at time $t$:** It asks, *"Does this solve my immediate problem right now?"*
-* **Changelog-Led Growth is the first derivative $\frac{dP}{dt}$:** It asks, *"At what speed is this team improving?"*
+* **PLG is the product's state at a single point in time, *P(t)*:** It asks, *"Does this solve my immediate problem right now?"*
+* **Changelog-Led Growth is the first derivative, *dP/dt* (velocity):** It asks, *"At what speed is this team improving?"*
 
 In developer tools and B2B SaaS, buyers don't just purchase what your software does on day one; they are taking a bet on where it will be in six months. A transparent, high-cadence changelog gives dormant users a genuine reason to re-engage, builds immense trust that bugs get squashed in days rather than quarters, and turns early adopters into passionate evangelists.
 
