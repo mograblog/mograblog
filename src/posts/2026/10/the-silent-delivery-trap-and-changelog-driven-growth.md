@@ -7,7 +7,7 @@ cover: /koalas/worker_koala.png
 coverTitle: Koala engineer actively building and shipping software
 ---
 
-There is a passage in Richard Rumelt’s classic book, ***Good Strategy/Bad Strategy: The Difference and Why It Matters*** (Chapter 15: *Putting It Together*), that has stayed with me for years:
+I was reading Richard Rumelt’s book, ***Good Strategy/Bad Strategy: The Difference and Why It Matters***, and a passage in Chapter 15 (*Putting It Together*) immediately stopped me in my tracks:
 
 > *"Compared to a competitor working on an eighteen-month cycle, Nvidia’s six-month cycle would mean that its chip would be the better product about 83 percent of the time. Plus, there is the constant buzz surrounding new product introductions, a substitute for expensive advertising."*
 >
@@ -68,6 +68,25 @@ Take tools like **Cursor** or **Claude Code**:
 To engineers and power users, this continuous drumbeat is intoxicating. It serves as **living proof of velocity**. It signals that the maintainers are obsessive, responsive to feedback, and pulling ahead of anyone moving at a quarterly pace.
 
 No paid ad campaign, PR firm, or billboard on Highway 101 can buy the credibility that a relentless changelog delivers.
+
+---
+
+## Where Product-Led Growth (PLG) Meets the Changelog
+
+In recent years, almost every tech startup has adopted the gospel of **Product-Led Growth (PLG)**: provide a frictionless, self-serve product so the software sells itself instead of relying on high-pressure sales reps.
+
+But traditional PLG has a quiet blind spot: **it tends to treat the product as a static snapshot.**
+
+If an engineer tries your product today, finds that one key feature is missing or hits a frustrating edge case, they put it on the shelf. In classic PLG, that user is often lost forever—or bombarded with desperate, automated "We miss you!" marketing emails that head straight for the trash.
+
+This is where **Changelog-Led Growth** completes the picture:
+
+* **PLG is the product's state at time $t$:** It asks, *"Does this solve my immediate problem right now?"*
+* **Changelog-Led Growth is the first derivative $\frac{dP}{dt}$:** It asks, *"At what speed is this team improving?"*
+
+In developer tools and B2B SaaS, buyers don't just purchase what your software does on day one; they are taking a bet on where it will be in six months. A transparent, high-cadence changelog gives dormant users a genuine reason to re-engage, builds immense trust that bugs get squashed in days rather than quarters, and turns early adopters into passionate evangelists.
+
+PLG provides the self-serve vehicle, but your changelog provides the compounding fuel.
 
 ---
 
