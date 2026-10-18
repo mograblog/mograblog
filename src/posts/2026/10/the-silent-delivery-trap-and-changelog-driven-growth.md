@@ -3,8 +3,8 @@ title: "The 'Silent Delivery' Trap: Why Release Cadence Is Your Best Marketing"
 published: 2026-10-18
 description: "In almost every startup I've worked at, engineering teams struggled with talking about their deliveries. Here is how Richard Rumelt's analysis of Nvidia and modern changelog culture show that shipping cadence is the ultimate substitute for expensive advertising."
 keywords: strategy, startups, engineering management, marketing, changelogs, developer tools, leadership
-cover: /koalas/changelog-billboard-koala.jpg
-coverTitle: Koala engineer updating a giant roadside changelog billboard over Silicon Valley at sunset
+cover: /koalas/mograblog-billboard-koala.jpg
+coverTitle: Koala engineer on a lift beside a giant highway billboard announcing a new Mograblog post at sunset
 ---
 
 I was reading Richard Rumelt’s book, ***Good Strategy/Bad Strategy: The Difference and Why It Matters***, and a passage in Chapter 15 (*Putting It Together*) immediately stopped me in my tracks:
