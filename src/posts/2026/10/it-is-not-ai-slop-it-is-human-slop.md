@@ -12,84 +12,50 @@ I recently came across this [post on X by Patrick Kuhnke](https://x.com/patrick_
 > *"vibe coding is the new low-code.*  
 > *good luck to whoever has to maintain it in five years."*
 
-It echoes a sentiment you hear everywhere across tech right now: that AI is flooding our repositories with low-quality, unmaintainable "slop."
+Every developer seems to be nodding along right now, blaming "AI slop" for ruining repositories.
 
-I disagree. Code quality today did not suddenly drop because of AI. The connection is not direct.
+I disagree. Code quality didn't drop because of AI. 
 
-If your codebase is turning into a swamp of unmaintainable code, calling it **AI Slop** is letting yourself off the hook. 
-
-In reality, **it’s Human Slop.**
-
-> [!NOTE]
-> ### TL;DR
-> - **AI doesn't commit to `main`:** AI merely increased code generation throughput. Humans are the ones clicking "Merge."
-> - **We always wrote bad code:** Juniors (and tired seniors) have always delivered subpar first drafts. That’s why we invented code reviews, linters, and design patterns.
-> - **The real failure is review culture:** AI made it easy to generate 1,000 lines of code in seconds, and humans took the bait by rubber-stamping it with "LGTM."
-> - **The senior engineer’s real job:** Don't fight AI—build the guardrails, enforce small PRs, and use the same AI to enforce quality standards before code ever reaches production.
+Calling it AI slop is a cop-out. **It's Human Slop.**
 
 ---
 
-## Low-Quality Code Isn't New
+## Low-Quality Code Was Always Normal
 
-Let's be honest about software history: developers have been shipping buggy, unreadable, brittle code for as long as compilers have existed.
+Software has never been pristine by default. 
 
-Junior developers have always submitted pull requests with awkward abstractions, missing edge cases, and questionable architecture. Honestly, so have experienced developers when rushing against a deadline.
+Junior developers have always written questionable abstractions. Seniors have always written brittle shortcuts when rushing against a deadline. We expected bad first drafts—that is literally why code reviews exist in the first place.
 
-We never expected developers to write pristine code on the first try. That’s why the industry spent decades building defensive engineering infrastructure:
-* Peer code reviews
-* Automated test suites and CI pipelines
-* Linters and static analysis
-* Architectural design patterns
+AI didn't introduce low-quality code to engineering teams. **It just increased the throughput.**
 
-The contract was simple: **you draft the code, but the team's review process ensures the quality.**
+Writing 1,000 lines of messy boilerplate used to take an engineer three days. Now it takes twenty seconds.
 
-So what actually changed with AI?
+And what happens when an engineer gets handed a 1,000-line diff? 
 
----
-
-## The LGTM Syndrome, Amplified
-
-AI didn’t degrade code quality. **It increased throughput.**
-
-Before AI, generating 1,500 lines of messy boilerplate took an engineer three days. Now, a model generates it in twenty seconds.
-
-And what happens when an engineer is handed a massive pull request? There's a classic [video by Alberta Tech](https://www.youtube.com/shorts/lUBPD2bWodA) that captures this perfectly:
-* **Review a 10-line PR:** 50 comments, deep debates over variable names, and intense scrutiny.
+There's a classic [video by Alberta Tech](https://www.youtube.com/shorts/lUBPD2bWodA) that captures reality:
+* **Review a 10-line PR:** 50 comments, 3 heated debates about variable naming.
 * **Review a 1,000-line PR:** *"Looks good to me (LGTM)"* ➔ Instant Approve.
 
-AI didn't invent this dynamic. Huge, bloated PRs existed long before language models, and developers were already rubber-stamping them because thoroughly reviewing 1,000 lines of code is mentally exhausting.
+Huge, unreadable PRs existed long before language models, and people were already rubber-stamping them because reviewing a thousand lines of unfamiliar code is exhausting.
 
-AI just made it trivial to produce those massive PRs repeatedly. 
+AI just gave everyone an infinite firehose to generate those pull requests.
 
-When developers prompt an agent, glance at the diff for three seconds, open a giant pull request, and their peer hits "Approve" without reading it—**that is not an AI failure. That is a human review failure.**
+When an engineer prompts an agent, glances at the diff for five seconds, opens a giant PR, and their teammate clicks "Approve" without reading it—that is not an AI failure. 
 
-AI produced the text. Humans allowed it into production.
-
----
-
-## The Fix Is In Our Control
-
-AI is undeniably a massive improvement. It enables engineers to prototype faster, explore unfamiliar frameworks, and automate tedious boilerplate.
-
-The good news is that the remedy is entirely in our hands. We don't have to accept bloated, unmaintainable code just because an LLM helped write it:
-
-1. **Keep PRs small:** There is no rule that says an AI-assisted PR has to be a 2,000-line monolith. Break problems down. Generate, review, and commit in small, digestible increments.
-2. **Never approve code you wouldn't explain in an interview:** If the author cannot explain how the code works, and the reviewer cannot explain why it’s safe, it shouldn't merge. Period.
-3. **Use AI to enforce standards, not just generate code:** If you have strict architectural conventions, feed them back into your agent via `CLAUDE.md`, system prompts, or automated pre-commit review bots. Make AI your first line of automated linting.
+**AI generated the code. A human clicked "Merge."**
 
 ---
 
-## What Experienced Engineers Should Focus On
+## The Steering Wheel Is Still Ours
 
-If you are a senior engineer, tech lead, or engineering manager, cursing "vibe coding" or lamenting "AI slop" is a waste of energy. The technology is here, and the productivity leverage is real.
+AI is a genuine superpower. It lets anyone prototype faster and eliminates tedious boilerplate. 
 
-Our job right now is to **streamline AI usage while upholding engineering rigor**:
-* Establish the guardrails that prevent unchecked code generation.
-* Re-instill a culture where thorough code review is valued over sheer commit volume.
-* Help junior engineers learn how to critique and refine AI output rather than blindly accepting it.
+The consequences of that speed are entirely in our control. We don't have to accept bloated, unmaintainable code:
 
-AI makes generating code effortless. It’s up to us to make sure it’s code worth keeping.
+1. **Keep PRs small.** There is no law saying an AI-assisted PR has to be a 2,000-line monolith. You control the scope of the prompt, the commit, and the review.
+2. **If you can't explain it, don't merge it.** If the author doesn't understand the diff and the reviewer didn't verify it, it has no business reaching `main`.
+3. **Use the AI as a quality gate, too.** Feed your linters, design rules, and architectural constraints back into the agent before code ever opens as a PR.
 
----
+Cursing "vibe coding" won't stop people from using it. 
 
-*What do you think? Are you seeing "AI slop" in your codebase, or is the breakdown really happening at the code review stage? Let me know in the comments below!*
+The real job for experienced engineers right now isn't to fight AI code generation—it's to make sure human review doesn't become a rubber stamp.
