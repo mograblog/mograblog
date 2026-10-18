@@ -15,10 +15,6 @@ I was reading Richard Rumelt’s classic book, ***Good Strategy/Bad Strategy: Th
 
 I found this quote deeply inspiring because **I have run into this exact tension in almost every startup I have ever been part of.**
 
-To be clear: this is **not** a call for engineering teams to "work faster" or burn out on an artificial release treadmill. In nearly every company I've seen, engineering was *already* shipping valuable improvements, squashing painful bugs, and polishing the product sprint after sprint. 
-
-The tragedy is that this delivery happened in complete silence—and the marketing team wasn't taking advantage of it.
-
 > [!NOTE]
 > ### TL;DR: The Key Takeaways
 > - **It's not "work faster," it's "stop the silence":** Engineering is already building value. The mistake is burying that progress inside closed PRs and commit logs.
@@ -67,17 +63,11 @@ Crucially, **it doesn't have to be "one and done."** A single engineering change
 
 One small code change becomes three or four natural touchpoints across X, LinkedIn, Discord, and newsletters—all without asking engineering to build something massive from scratch.
 
-To developers and software buyers, this continuous drumbeat is far more convincing than corporate slogans. It serves as **living proof of velocity**. It signals that the engineering team is responsive, obsessive about detail, and actively listening to users.
-
 ---
 
 ## Where Product-Led Growth (PLG) Meets the Changelog
 
-In recent years, almost every tech startup has adopted the gospel of **Product-Led Growth (PLG)**: provide a frictionless, self-serve product so the software sells itself instead of relying on high-pressure sales reps.
-
-But traditional PLG has a quiet blind spot: **it tends to treat the product as a static snapshot.**
-
-If an engineer tries your product today, finds that one key feature is missing or hits a frustrating edge case, they put it on the shelf. In classic PLG, that user is often lost forever—or bombarded with desperate, automated "We miss you!" marketing emails that head straight for the trash.
+Traditional Product-Led Growth (PLG) has a blind spot: it treats software as a static snapshot. If a developer bounces today because a feature was missing, automated *"We miss you!"* emails won't bring them back.
 
 This is where **Changelog-Led Growth** completes the picture:
 
@@ -96,13 +86,7 @@ PLG provides the self-serve vehicle, but your changelog provides the compounding
 
 To me, the big insight isn't about demanding that engineers work faster or push harder. It is to **stop letting solid engineering work die in silence.**
 
-From what I’ve experienced, engineering teams are usually already delivering meaningful value week after week. The breakthrough happens when marketing and engineering find common ground:
-
-* **Marketing** gains an endless supply of high-credibility, authentic stories to tell without needing expensive ad budgets.
-* **Engineering** sees their hard work recognized, validated, and celebrated by real users.
-* **Customers** see a living, accelerating product they can confidently bet on for the future.
-
-When those efforts are coherent, your release notes become your marketing, your changelog becomes your retention engine, and what you already ship every day becomes your greatest competitive moat.
+When marketing breaks out of its silo and taps into what engineering already ships every week, your release notes become your marketing, your changelog becomes your retention engine, and your everyday delivery becomes your greatest competitive moat.
 
 ---
 
