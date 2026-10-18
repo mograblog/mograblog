@@ -90,7 +90,9 @@ This is where **Changelog-Led Growth** completes the picture:
 * **PLG is the product's state at a single point in time, *P(t)*:** It asks, *"Does this solve my immediate problem right now?"*
 * **Changelog-Led Growth is the first derivative, *dP/dt* (velocity):** It asks, *"At what speed is this team improving?"*
 
-In developer tools and B2B SaaS, buyers don't just purchase what your software does on day one; they are taking a bet on where it will be in six months. A transparent, high-cadence changelog gives dormant users a genuine reason to re-engage, builds immense trust that bugs get squashed in days rather than quarters, and turns early adopters into passionate evangelists.
+> <strong class="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white not-italic block">“In developer tools and B2B SaaS, buyers don't just purchase what your software does on day one; <span class="underline decoration-sky-500/70 decoration-2 underline-offset-4">they are taking a bet on where it will be in six months.</span>”</strong>
+
+A transparent, high-cadence changelog gives dormant users a genuine reason to re-engage, builds immense trust that bugs get squashed in days rather than quarters, and turns early adopters into passionate evangelists.
 
 PLG provides the self-serve vehicle, but your changelog provides the compounding fuel.
 
