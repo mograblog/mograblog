@@ -39,43 +39,27 @@ When marketing isn't plugged into what engineering is actually delivering, every
 
 ---
 
-## What Nvidia Did Differently: The Power of Coherent Action
+## Look at Your Feed: Claude, Cursor, and "Insignificant" Updates
 
-In the late 1990s, Nvidia was an underdog in the nascent 3D graphics market. Giants like Silicon Graphics, 3dfx, and even Intel held massive brand awareness, cash reserves, and multi-million-dollar marketing budgets.
+Rumelt used Nvidia’s 6-month release cadence in the late 1990s to illustrate this, but we don't need to look back decades to see it in action. We see it dominating tech feeds right now with tools like **Claude** (Anthropic / Claude Code) and **Cursor**.
 
-Nvidia couldn't outspend them on splashy trade show booths or expensive magazine advertising. 
+Open Twitter/X, LinkedIn, or Reddit, and the developer conversation is perpetually flooded with posts about them.
 
-Instead, founder Jensen Huang orchestrated what Richard Rumelt calls **Coherent Action**—a rare alignment where the activities of different departments directly reinforce and complement one another:
+If you look closely at what people are sharing, a huge portion of these updates are **largely insignificant**:
+* A minor keyboard shortcut tweak.
+* A subtle change in how diffs or inline edits render.
+* A tiny latency improvement or small prompt tweak.
+* A fix for an edge-case terminal glitch.
 
-> *"Strategy creates strength through the coherence of its design... Most organizations don't have strategy; they have separate departments pursuing uncoordinated goals."*
-> — Richard Rumelt, *Good Strategy/Bad Strategy*
+In the old startup mindset, almost no marketing team would touch these. They’d think: *"That's an incremental fix—let's wait until we have a big launch."*
 
-Instead of treating Marketing and Engineering as two separate fiefdoms with isolated goals, Nvidia intertwined them:
+Yet in reality, these tiny deliveries achieve everything marketing dreams of:
 
-1. **Engineering invested in enabling cadence:** They restructured engineering processes—investing heavily in software emulation, unified driver architectures, and multiple overlapping design teams—specifically to guarantee a working chip every six months.
-2. **Marketing weaponized the cadence:** Marketing didn't need to invent hype out of thin air or buy costly ad space. Every 180 days, like clockwork, they had real, tangible breakthroughs to hand to journalists, game developers, and consumers.
+1. **They create constant community buzz:** Users, influencers, and developers actively test, screenshot, and debate every small tweak.
+2. **They build unstoppable brand recognition:** Claude and Cursor remain permanently top-of-mind. You cannot scroll through your feed without being reminded that their teams are shipping every day.
+3. **They directly answer marketing's needs:** Marketing gets an endless stream of authentic, high-converting content—building trust and engagement without spending a dime on paid ad campaigns or PR firms.
 
-The payoff was huge:
-* **Product Superiority:** A 6-month cycle mathematically ensured their chips were faster and more advanced than rivals about 83% of the time.
-* **Organic Mindshare:** Tech reviewers and gamers were perpetually buzzing about the latest release. Engineering's rhythm became marketing's greatest weapon—**a continuous, authentic substitute for expensive advertising**.
-
----
-
-## The Modern Playbook: Marketing What Engineering Already Builds
-
-Fast forward to today, and this exact principle of departmental coherence is revolutionizing modern developer tooling and B2B SaaS.
-
-Take companies like **Cursor**, **Claude Code**, **Linear**, or **Supabase**:
-
-Their marketing teams don't sit in a separate silo waiting for quarterly campaign briefs. Instead, **marketing acts as the megaphone for what engineering already built this week:**
-
-* When engineers fix a nagging latency bottleneck or polish a keyboard shortcut, marketing captures a 15-second screen recording and shares it on X/Twitter and Discord.
-* When a new integration or feature lands in `main`, it immediately enters a crisp, readable changelog.
-* Marketing isn't manufacturing artificial hype; they are translating engineering's daily commits into customer value.
-
-To developers and software buyers, this continuous drumbeat is infinitely more convincing than corporate slogans. It serves as **living proof of velocity**. It signals that the engineering team is responsive, obsessive about quality, and actively listening to users.
-
-No paid ad campaign, PR agency, or highway billboard can buy the authentic trust that coherent changelog communication delivers.
+To developers and software buyers, this continuous drumbeat is far more convincing than corporate slogans. It serves as **living proof of velocity**. It signals that the engineering team is responsive, obsessive about detail, and actively listening to users.
 
 ---
 
@@ -102,7 +86,7 @@ PLG provides the self-serve vehicle, but your changelog provides the compounding
 
 ## Conclusion: What I Took Away
 
-To me, the big insight from Richard Rumelt and Nvidia isn't about demanding that engineers work faster or push harder. It is to **stop letting solid engineering work die in silence.**
+To me, the big insight isn't about demanding that engineers work faster or push harder. It is to **stop letting solid engineering work die in silence.**
 
 From what I’ve experienced, engineering teams are usually already delivering meaningful value week after week. The breakthrough happens when marketing and engineering find common ground:
 
