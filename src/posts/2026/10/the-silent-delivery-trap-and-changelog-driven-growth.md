@@ -1,7 +1,7 @@
 ---
-title: "The 'Silent Delivery' Trap: Why Marketing Must Tap Into What Engineering Already Ships"
+title: "The 'Silent Delivery' Marketing Trap and Changelog-Driven Growth"
 published: 2026-10-18
-description: "In almost every startup I've worked at, engineering delivered steady value, but it remained silent—leaving marketing disconnected. Here is how Richard Rumelt's principle of coherent action shows that turning what you already ship into marketing fuel beats expensive advertising."
+description: "How can your marketing make the most of your engineering deliveries? Inspired by Richard Rumelt's Good Strategy/Bad Strategy and modern changelog culture, here is how departmental coherence turns continuous shipping into your best marketing."
 keywords: strategy, startups, engineering management, marketing, changelogs, developer tools, leadership, coherent action
 cover: /koalas/mograblog-billboard-koala.jpg
 coverTitle: Koala engineer on a lift beside a giant highway billboard announcing a new Mograblog post at sunset
