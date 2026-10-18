@@ -4,7 +4,7 @@ published: 2026-10-18
 description: "Everyone is complaining about low-quality AI code and 'vibe coding'. But code quality didn't crash because of AI. It crashed because humans are rubber-stamping code they didn't review."
 keywords: ai, code quality, software engineering, code review, vibe coding, developer productivity, tech debt
 cover: /koalas/ai-slop-code-review-koala.jpg
-coverTitle: Senior koala engineer reviewing code diffs with linters and automated tests alongside an AI assistant
+coverTitle: Senior koala engineer wearing a 'Just Approve It / human slop' shirt with an LGTM coffee mug
 ---
 
 I recently came across this [post on X by Patrick Kuhnke](https://x.com/patrick_kuhnke_/status/2111825796872732921):
