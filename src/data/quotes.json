@@ -5,5 +5,16 @@
     "author": "Richard Rumelt",
     "book": "Good Strategy/Bad Strategy: The Difference and Why It Matters",
     "year": 2011
+  },
+  {
+    "id": 2,
+    "quote": "Compared to a competitor working on an eighteen-month cycle, Nvidia’s six-month cycle would mean that its chip would be the better product about 83 percent of the time. Plus, there is the constant buzz surrounding new product introductions, a substitute for expensive advertising.",
+    "author": "Richard Rumelt",
+    "book": "Good Strategy/Bad Strategy: The Difference and Why It Matters",
+    "chapter": "Chapter 15 (Putting It Together)",
+    "year": 2011,
+    "insight": "In almost every startup I've worked at, engineering teams struggled with talking about their deliveries—worried that publicizing incremental work feels like cheap marketing or compromises professionalism. But in modern developer tools (like Cursor or Claude Code), release cadence is marketing. Transparent changelogs build brand recognition and organic buzz that no ad budget can match.",
+    "articleUrl": "/2026/10/the-silent-delivery-trap-and-changelog-driven-growth",
+    "articleTitle": "The 'Silent Delivery' Trap: Why Release Cadence Is Your Best Marketing"
   }
 ]
