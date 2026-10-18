@@ -46,4 +46,8 @@ AI is a genuine superpower. But the consequences of that speed are entirely in o
 2. **If you can't explain it, don't merge it.** If the author doesn't understand the diff and the reviewer didn't verify it, it shouldn't reach `main`.
 3. **Use the AI as a quality gate, too.** Feed your linters, design rules, and constraints back into the agent before the code is ever committed.
 
-Cursing "vibe coding" won't stop it. The real job for senior engineers today isn't to fight AI code generation—it's to stop human review from becoming a rubber stamp.
+**AI is not vibe coding.**
+
+AI is an engineering multiplier. Vibe coding is just abandoning code review.
+
+Our job isn't to fight the tool—it's to stop human review from becoming a rubber stamp.
