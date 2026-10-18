@@ -29,9 +29,7 @@ import quotes from '../data/quotes.json';
           <div class="flex items-start gap-4">
             <span class="text-3xl sm:text-4xl select-none font-serif text-sky-500/40 dark:text-sky-400/30 leading-none">“</span>
             <div class="flex-1">
-              <blockquote class="text-base sm:text-lg text-neutral-800 dark:text-neutral-200 leading-relaxed font-normal mb-5">
-                {item.quote}
-              </blockquote>
+              <blockquote class="text-base sm:text-lg text-neutral-800 dark:text-neutral-200 leading-relaxed font-normal mb-5" set:html={item.quote} />
 
               <div class="pt-4 border-t border-neutral-200/70 dark:border-neutral-800/80 flex flex-wrap items-baseline justify-between gap-2">
                 <div>

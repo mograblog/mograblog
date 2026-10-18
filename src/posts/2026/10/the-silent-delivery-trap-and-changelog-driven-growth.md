@@ -9,7 +9,7 @@ coverTitle: Koala engineer actively building and shipping software
 
 I was reading Richard Rumelt’s book, ***Good Strategy/Bad Strategy: The Difference and Why It Matters***, and a passage in Chapter 15 (*Putting It Together*) immediately stopped me in my tracks:
 
-> *"Compared to a competitor working on an eighteen-month cycle, Nvidia’s six-month cycle would mean that its chip would be the better product about 83 percent of the time. Plus, there is the constant buzz surrounding new product introductions, a substitute for expensive advertising."*
+> *"Compared to a competitor working on an eighteen-month cycle, Nvidia’s six-month cycle would mean that its chip would be the better product about 83 percent of the time. <strong class="underline decoration-sky-500/70 decoration-2 underline-offset-4 font-bold text-neutral-900 dark:text-white">Plus, there is the constant buzz surrounding new product introductions, a substitute for expensive advertising.</strong>"*
 >
 > — *(Featured in my [Book Quotes collection](/quotes))*
 
