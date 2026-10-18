@@ -27,18 +27,15 @@ The tragedy is that this delivery happened in complete silence—and the marketi
 
 ---
 
-## What I Observed: Two Silos That Don't Talk
+## The Cost of the Disconnect
 
-I don't claim to have a universal playbook or know how every company operates, but looking back at the startups I've worked at, this was a recurring pattern I kept bumping into. It often felt like engineering and marketing were operating in two separate universes:
+In almost every startup I've worked at, engineering shipped steady improvements while marketing operated in an isolated silo. 
 
-* **From where I sat in engineering:** We were heads down solving tricky architectural hurdles, squashing nasty race conditions, and shipping small improvements week after week. But our instinct was almost always silence: *"Good code should speak for itself,"* or *"Why make noise over an incremental fix? Let's wait for the big Version 2.0 release."*
-* **From what I observed of marketing:** Meanwhile, the marketing folks were often trying to brainstorm campaigns from scratch or waiting for those rare "big launches." It seemed like they were starved for concrete substance to talk about, simply because they weren't wired into the daily stream of what was actually happening in the codebase.
+When marketing isn't plugged into what engineering is actually delivering, everyone loses:
 
-The way I interpreted the cost of this disconnect was pretty painful:
-
-1. **Engineering feels invisible:** We'd pour weeks of effort into real improvements, only for nobody outside our GitHub repo to notice. It felt like shipping into a void.
-2. **Marketing is forced to invent stories:** Without a steady feed of real product deliveries, marketing naturally leans on more abstract messaging or paid ads, missing out on the genuine progress happening right under their nose.
-3. **Users perceive silence as stagnation:** From the outside, if users don't hear from you, they assume nothing is happening—even when the team is shipping code every day.
+1. **Engineering feels invisible:** We poured weeks into real fixes and performance wins, only for nobody outside our GitHub repo to notice. It felt like shipping into a void.
+2. **Marketing is forced to invent hype:** Without a steady feed of real product deliveries, marketing leans on abstract messaging and paid ads—missing the genuine progress happening right under their nose.
+3. **Users assume stagnation:** If users don't see public evidence of progress, they assume the product is abandoned, even if the team is committing code every single day.
 
 ---
 
@@ -58,7 +55,7 @@ Instead of treating Marketing and Engineering as two separate fiefdoms with isol
 1. **Engineering invested in enabling cadence:** They restructured engineering processes—investing heavily in software emulation, unified driver architectures, and multiple overlapping design teams—specifically to guarantee a working chip every six months.
 2. **Marketing weaponized the cadence:** Marketing didn't need to invent hype out of thin air or buy costly ad space. Every 180 days, like clockwork, they had real, tangible breakthroughs to hand to journalists, game developers, and consumers.
 
-The strategic payoff was asymmetric:
+The payoff was huge:
 * **Product Superiority:** A 6-month cycle mathematically ensured their chips were faster and more advanced than rivals about 83% of the time.
 * **Organic Mindshare:** Tech reviewers and gamers were perpetually buzzing about the latest release. Engineering's rhythm became marketing's greatest weapon—**a continuous, authentic substitute for expensive advertising**.
 
