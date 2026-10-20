@@ -1,0 +1,111 @@
+---
+import { getCollection, render } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => Boolean(data.draft));
+  
+  return posts.map((entry) => {
+    const cleanSlug = entry.id.replace(/\.md$/, '');
+    return {
+      params: { slug: cleanSlug },
+      props: { entry },
+    };
+  });
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<PostLayout
+  title={entry.data.title}
+  published={entry.data.published}
+  slug={entry.id.replace(/\.md$/, '')}
+  description={entry.data.description}
+  keywords={entry.data.keywords}
+  cover={entry.data.cover}
+  coverTitle={entry.data.coverTitle}
+  draft={true}
+>
+  <!-- Gated Admin Preview Screen -->
+  <div id="draft-auth-lock" class="my-12 p-8 max-w-md mx-auto rounded-3xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/60 dark:bg-amber-950/30 backdrop-blur shadow-xl text-center space-y-5">
+    <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-100 dark:bg-amber-900/50 border border-amber-300 dark:border-amber-700/80 flex items-center justify-center text-amber-700 dark:text-amber-300 text-2xl shadow-inner">
+      🔒
+    </div>
+    <div>
+      <h2 class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white mb-1.5">
+        Unpublished Draft Preview
+      </h2>
+      <p id="draft-auth-msg" class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+        This article is currently in private draft. Sign in with your authorized admin account to preview the full content.
+      </p>
+    </div>
+
+    <!-- Clerk Sign-In Button Trigger -->
+    <button
+      id="btn-draft-login"
+      type="button"
+      class="w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-600/20 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+      <span>Sign In with Admin Account</span>
+    </button>
+  </div>
+
+  <!-- Authenticated Draft Content -->
+  <div id="draft-protected-content" class="hidden">
+    <div class="mb-8 p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 text-xs font-semibold flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>Authenticated Admin Preview</span>
+      </div>
+      <span class="font-mono text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-700">
+        draft: true
+      </span>
+    </div>
+
+    <Content />
+  </div>
+</PostLayout>
+
+<script>
+  import { initClerk, getClerkUser, openSignInModal, onAuthChange } from '../../lib/clerk';
+
+  const lockEl = document.getElementById('draft-auth-lock');
+  const contentEl = document.getElementById('draft-protected-content');
+  const loginBtn = document.getElementById('btn-draft-login');
+
+  loginBtn?.addEventListener('click', () => {
+    openSignInModal();
+  });
+
+  async function checkAdmin() {
+    try {
+      const clerk = await initClerk();
+      const user = getClerkUser(clerk);
+      handleAuthState(user);
+
+      onAuthChange((u) => {
+        handleAuthState(u);
+      });
+    } catch (e) {
+      console.warn('Draft clerk auth check error:', e);
+      if (lockEl) lockEl.classList.remove('hidden');
+      if (contentEl) contentEl.classList.add('hidden');
+    }
+  }
+
+  function handleAuthState(user: any) {
+    if (user && user.isAdmin) {
+      lockEl?.classList.add('hidden');
+      contentEl?.classList.remove('hidden');
+    } else {
+      lockEl?.classList.remove('hidden');
+      contentEl?.classList.add('hidden');
+    }
+  }
+
+  // Initial check
+  checkAdmin();
+</script>

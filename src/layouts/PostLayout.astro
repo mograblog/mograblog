@@ -69,6 +69,7 @@ const blogPostingSchema = {
   containerClass="max-w-6xl"
   type="article"
   publishedTime={publishedIso}
+  noindex={draft}
 >
   <script type="application/ld+json" is:inline set:html={JSON.stringify(blogPostingSchema)} />
   <div class="relative max-w-3xl mx-auto">
@@ -93,11 +94,11 @@ const blogPostingSchema = {
           <span class="text-2xl flex-shrink-0">⚠️</span>
           <div>
             <div class="font-bold flex items-center gap-2">
-              <span>LOCAL DRAFT PREVIEW</span>
+              <span>DRAFT PREVIEW</span>
               <span class="px-2 py-0.5 text-xs rounded-full bg-amber-200 dark:bg-amber-900/80 text-amber-900 dark:text-amber-200 font-mono font-semibold">draft: true</span>
             </div>
             <p class="text-xs text-amber-800 dark:text-amber-300/90 mt-0.5">
-              This post is only visible on localhost. It is completely excluded from production builds, RSS feeds, and Google's sitemap until published.
+              This post is in draft. It is excluded from public listings, RSS feeds, and search engines until published.
             </p>
           </div>
         </div>
