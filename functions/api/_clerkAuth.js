@@ -98,7 +98,20 @@ export async function verifyClerkJwt(token, env) {
 
 export async function getAuthenticatedUser(request, env) {
   const authHeader = request.headers.get('Authorization') || '';
-  const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7).trim() : authHeader.trim();
+  let token = authHeader.startsWith('Bearer ') ? authHeader.substring(7).trim() : authHeader.trim();
+
+  // If no Bearer token, check __session cookie from Clerk
+  if (!token) {
+    const cookieHeader = request.headers.get('Cookie') || '';
+    const cookies = Object.fromEntries(
+      cookieHeader.split(';').map((c) => {
+        const [k, ...v] = c.trim().split('=');
+        return [k, v.join('=')];
+      })
+    );
+    token = cookies['__session'] || '';
+  }
+
   if (!token) return null;
 
   // 1. Verify via public JWKS key
@@ -117,6 +130,8 @@ export async function getAuthenticatedUser(request, env) {
   if (adminUserId && userId === adminUserId) {
     isAdmin = true;
   } else if (adminEmail && tokenEmail === adminEmail) {
+    isAdmin = true;
+  } else if (verifiedPayload.public_metadata?.isAdmin || verifiedPayload.metadata?.isAdmin) {
     isAdmin = true;
   }
 
