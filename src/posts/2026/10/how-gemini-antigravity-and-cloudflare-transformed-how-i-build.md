@@ -5,7 +5,7 @@ description: "An honest braindump on how pairing Gemini Antigravity (Gemini 3.8 
 keywords: braindump, ai, gemini antigravity, cloudflare, astro, fullstack, software engineering, developer productivity, gemini 3.8 flash, devops, clickops, microsoft clarity
 cover: /koalas/gemini-cloudflare-koala.jpg
 coverTitle: Senior koala engineer pairing Gemini Antigravity with Cloudflare to ship blazing fast fullstack websites
-draft: true
+draft: false
 toc: true
 ---
 
