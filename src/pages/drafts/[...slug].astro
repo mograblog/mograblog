@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts', ({ data }) => Boolean(data.draft));
+  const posts = await getCollection('posts');
   
   return posts.map((entry) => {
     const cleanSlug = entry.id.replace(/\.md$/, '');
@@ -15,6 +15,12 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
+const cleanSlug = entry.id.replace(/\.md$/, '');
+
+// If the post has been published, permanently redirect to its canonical live URL!
+if (!entry.data.draft) {
+  return Astro.redirect(`/${cleanSlug}/`, 301);
+}
 const { Content, headings } = await render(entry);
 ---
 
