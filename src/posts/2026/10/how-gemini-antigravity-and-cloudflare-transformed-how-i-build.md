@@ -2,7 +2,7 @@
 title: "Building Websites in the AI Era: How Gemini Antigravity and Cloudflare Changed Everything"
 published: 2026-10-21
 description: "How pairing Gemini Antigravity (Gemini 3.8 Flash on Medium effort) with Cloudflare eliminated site maintenance friction, accelerated content, and transformed both my blog and my wife's clinic website."
-keywords: ai, gemini antigravity, cloudflare, astro, fullstack, software engineering, developer productivity, gemini 3.8 flash, devops, clickops
+keywords: ai, gemini antigravity, cloudflare, astro, fullstack, software engineering, developer productivity, gemini 3.8 flash, devops, clickops, microsoft clarity
 cover: /koalas/gemini-cloudflare-koala.jpg
 coverTitle: Senior koala engineer pairing Gemini Antigravity with Cloudflare to ship blazing fast fullstack websites
 draft: true
@@ -89,15 +89,42 @@ When your AI coding environment can manipulate your entire cloud infrastructure 
 
 ## The Real-World Test: A Clinic Website
 
-A personal developer blog is one thing—we tolerate tinkering and rough edges on our own sites. A real business is another.
+A personal developer blog is one thing—we tolerate tinkering and rough edges on our own sites. A real commercial business is another.
 
-My wife runs an aesthetic clinic, and her website ([www.milabeautyinjections.com](https://www.milabeautyinjections.com)) is how clients discover treatments and book appointments.
+My wife runs an aesthetic medical clinic, and her website ([www.milabeautyinjections.com](https://www.milabeautyinjections.com)) is how clients discover treatments and book appointments.
 
-In the past, maintaining a family member's business website was something every software engineer quietly dreaded: updating service lists, changing photo layouts, or fixing mobile navigation meant context-switching, local builds, and manual testing. You’d put off small requests because the friction was annoying.
+In the past, maintaining a family member's business website was something every software engineer quietly dreaded: updating service lists, changing photo layouts, or fixing mobile navigation meant context-switching, local builds, and manual testing. You’d put off requests because the friction was annoying.
 
-With Gemini Antigravity and Cloudflare, **I don’t think twice before making a change.**
+With Gemini Antigravity and Cloudflare, **I don’t think twice before making a change.** Here are three real examples:
 
-When she asks for an update—whether it's adjusting the design, adding a treatment section, or polishing the mobile layout—it's done in minutes. She gets faster turnaround and better design, and I don't have to spend my weekend babysitting infrastructure.
+### 1. Breaking the "Deer in the Headlights" Paralysis: The Awards Page
+Mila won an industry award at the beginning of the year. I had meant to showcase it on the site for months, but never found the time.
+
+When starting a new page from scratch, I often get blinded like a deer in the headlights—there are too many design directions, layout options, and copy decisions. Analysis paralysis sets in, and you stall.
+
+With Gemini Antigravity:
+1. **It found the lost asset:** I had misplaced the original image; the AI helped locate it across project directories.
+2. **It generated the first implementation:** Instead of staring at an empty file, the AI scaffolded a complete, styled layout.
+3. **We iterated:** It is infinitely easier to refine something that already exists than to start from zero. Make it work, then make it work better. A task delayed for nine months was completed and deployed in twenty minutes.
+
+### 2. The Packages Carousel: Pricing Front and Center
+We received feedback from prospective clients that treatment packages and pricing needed to be more front and center on the site.
+
+Instead of fighting clunky visual builder widgets, I brainstormed the UX directly with the AI. Together, we built an elegant interactive packages carousel that brought pricing, treatment details, and booking triggers right into the spotlight—fully responsive and matching the clinic's luxury aesthetic.
+
+### 3. Discovering Unknown Blockers with Microsoft Clarity
+My analytics setup was only as good as the tools I already knew—historically, that meant heavyweight platforms like Mixpanel or FullStory.
+
+When I asked the AI how to get better visibility into user drop-offs without slowing down the site, it recommended **Microsoft Clarity**. It set up the integration script in seconds.
+
+The result was unbelievable: session recordings immediately highlighted unexpected friction points where real visitors were getting stuck on mobile navigation. We diagnosed and fixed those blockers the exact same day.
+
+### Unlocking Features That Squarespace Never Could
+Beyond small tweaks, the AI allowed me to build features that would have been practically impossible on Squarespace or Wix without expensive third-party plugins. 
+
+A prime example is **"Chat with Mila"**—a custom on-site interactive assistant that helps patients explore aesthetic treatments and answers common questions before booking. 
+
+The AI handles cross-website design changes in minutes while preserving visual consistency, generates bespoke imagery when needed, and eliminates the fear of breaking production.
 
 ---
 
