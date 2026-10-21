@@ -265,4 +265,46 @@
     linear-gradient(-45deg, transparent 75%, #334155 75%);
 }
 
+/* ==========================================================================
+   Editorial Quote Highlights with Share Actions
+   ========================================================================== */
+.quote-highlight-card {
+  position: relative;
+  margin: 2.25rem 0 !important;
+  padding: 1.5rem !important;
+  border-left: 4px solid #0284c7 !important;
+  border-radius: 0 1rem 1rem 0 !important;
+  background: rgba(2, 132, 199, 0.04) !important;
+  border-top: 1px solid rgba(2, 132, 199, 0.12) !important;
+  border-right: 1px solid rgba(2, 132, 199, 0.12) !important;
+  border-bottom: 1px solid rgba(2, 132, 199, 0.12) !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.dark .quote-highlight-card {
+  background: rgba(2, 132, 199, 0.07) !important;
+  border-left-color: #38bdf8 !important;
+  border-top-color: rgba(56, 189, 248, 0.15) !important;
+  border-right-color: rgba(56, 189, 248, 0.15) !important;
+  border-bottom-color: rgba(56, 189, 248, 0.15) !important;
+}
+
+.quote-highlight-card:hover {
+  background: rgba(2, 132, 199, 0.07) !important;
+}
+
+.dark .quote-highlight-card:hover {
+  background: rgba(2, 132, 199, 0.11) !important;
+}
+
+:target.quote-highlight-card {
+  animation: targetPulse 2.5s ease-out;
+}
+
+@keyframes targetPulse {
+  0% { outline: 3px solid #38bdf8; outline-offset: 4px; }
+  100% { outline: 3px solid transparent; outline-offset: 4px; }
+}
+
+
 

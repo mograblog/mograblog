@@ -85,7 +85,7 @@ Even for experienced programmers who can write code with their eyes closed, thos
 
 And while these platforms are now scrambling to adapt to the AI age—bolting on "AI site builders" and copilot sidebars inside their visual editors—they're doing an awful job at it. I honestly expect them to fail.
 
-> <span class="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white not-italic block my-1">"They are dead. They just don't know it yet."</span>
+> <span class="quote-highlight text-xl md:text-2xl font-bold text-neutral-900 dark:text-white not-italic block my-1" data-quote-id="they-are-dead">“They are dead; they just don't know it yet.”</span>
 
 Visual site builders were always an intermediate compromise: an awkward visual layer invented because non-programmers couldn't write code, and programmers didn't have the time to build everything from scratch. 
 
@@ -120,7 +120,9 @@ The real bottlenecks were always two things: **Design** and **Deployments**.
 
 Design could sometimes be solved by outsourcing to Fiverr. But deployments had no clean solution. Even the modern wave of "Docker-to-cloud" platforms was a partial fix at best—they just shifted the operational headache from bare-metal servers to container orchestration and YAML soup.
 
-In fact, **DevOps has felt like a failed promise for years.**
+In fact:
+
+> <span class="quote-highlight text-xl md:text-2xl font-bold text-neutral-900 dark:text-white not-italic block my-1" data-quote-id="devops-failed-promise">“DevOps has felt like a failed promise for years.”</span>
 
 We preached "Infrastructure as Code" and continuous delivery, but in reality, most developers still defaulted to **ClickOps**—manually clicking around five different cloud dashboards—because writing, debugging, and maintaining deployment automations took longer than just clicking the buttons ourselves.
 
