@@ -32,6 +32,73 @@ It's: **"What can we build today?"**
 
 ---
 
+## The Infrastructure: Why DevOps Was a Failed Promise (Until Now)
+
+Writing website code was never the hard part for me. 
+
+The real bottlenecks were always two things: **Design** and **Deployments**.
+
+Design could sometimes be solved by outsourcing to Fiverr. But deployments had no clean solution. Even the modern wave of "Docker-to-cloud" platforms was a partial fix at best—they just shifted the operational headache from bare-metal servers to container orchestration and YAML soup.
+
+In fact:
+
+> <span class="quote-highlight text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white not-italic block my-1" data-quote-id="devops-unfulfilled-promise">“DevOps was an unfulfilled promise for a decade—we traded server management for YAML soup and ClickOps. AI is the missing piece that finally makes continuous delivery effortless.”</span>
+
+We preached "Infrastructure as Code" and continuous delivery, but in reality, most developers still defaulted to **ClickOps**—manually clicking around five different cloud dashboards—because writing, debugging, and maintaining deployment automations took longer than just clicking the buttons ourselves.
+
+**AI is the missing piece that makes DevOps finally work.**
+
+Now, DevOps feels like the natural way to build. I’m actually motivated to go the extra mile, generate a scoped Cloudflare API token, and hand it to my agent. Why? Because it’s **actually faster**.
+
+Instead of me spending three hours debugging CI scripts and webhook configs, I give the agent the API token, and it handles the entire loop:
+* **Cloudflare Pages & Functions:** Static site generation at the edge with instant serverless API endpoints.
+* **Cloudflare D1:** A fast, serverless relational SQL database (SQLite) that is infinitely easier to manage than document stores.
+* **Cloudflare R2:** S3-compatible object storage with zero egress fees.
+* **DNS & Domain Management:** Built-in SSL, DDoS protection, and edge caching out of the box.
+
+Best of all: **the free tier is extraordinarily generous**, and the entire platform can be managed through clean APIs using a single scoped token.
+
+When your AI coding environment can manipulate your entire cloud infrastructure through a clean API token in seconds, the friction of deployment completely vanishes.
+
+---
+
+## Why Wix, Squarespace, and Framer Are Falling Behind
+
+If deployments were the backend headache, visual site builders were supposed to be the frontend shortcut. For years, whenever someone needed a website quickly, the standard advice was: *"Just use Wix, Squarespace, or Framer."*
+
+I tried. I really tried to use them.
+
+Even for experienced programmers who can write code with their eyes closed, those platforms added a massive overhead of learning their proprietary visual builders, quirky UI widgets, and locked-in ecosystems. You spent hours clicking around unfamiliar menus, fighting responsive breakpoints inside a visual canvas, and ending up with bloated, slow-loading pages.
+
+And while these platforms are scrambling to adapt to the AI age—bolting on "AI site builders" and copilot sidebars inside their visual editors—they're doing an awful job at it. 
+
+> <span class="quote-highlight text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white not-italic block my-1" data-quote-id="traditional-site-builders-dead">“Traditional site builders are failing to adapt to the AI era. They are practically dead; they just don't know it yet.”</span>
+
+Visual site builders were always an intermediate compromise: an awkward visual layer invented because non-programmers couldn't write code, and programmers didn't have the time to build everything from scratch. 
+
+Now that an AI agent can write, refactor, and deploy standard, pristine web code—HTML, CSS, TypeScript, Astro, and Tailwind—the entire premise of a proprietary visual canvas collapses. You get total control, instant page loads, zero vendor lock-in, and zero subscription tax. You don't need a visual builder anymore. You just need an agent and the open web.
+
+---
+
+## The AI Engine: Gemini 3.8 Flash on Medium Effort
+
+There is a common misconception that using AI in software engineering requires defaulting to the largest, slowest models available.
+
+For development, I rely heavily on **Gemini Antigravity**, specifically running **Gemini 3.8 Flash with Medium thinking effort**.
+
+I’ve found 3.8 Flash on Medium effort to hit the ultimate sweet spot:
+* **Speed:** Instant responsiveness without long delays.
+* **Reasoning:** Thorough enough to refactor code, catch subtle edge cases, and run multi-step workspace tasks cleanly.
+* **Token & Cost Efficiency:** Incredibly lightweight, letting me iterate through dozens of diffs in a single sitting without hitting rate limits or high bills.
+
+Because the tool friction is gone, the editorial quality actually goes *up*:
+1. **Focus on substance over maintenance:** I spend my energy thinking through the thesis, not debugging CSS layout bugs or configuring build pipelines.
+2. **Timely publishing cadence:** When an interesting tech debate happens, I can publish a thoughtful take while the conversation is still relevant.
+3. **Overcoming the language tax:** English is not my first language. In the past, writing technical articles in English always carried an extra cognitive tax. I knew the engineering concepts inside out, but I’d spend energy second-guessing phrasing, grammar, or whether an idiom sounded natural. Gemini acts like an in-house technical editor: it polishes the English and tightens the flow while keeping my authentic voice and technical arguments intact.
+4. **Live, working examples:** Instead of just pasting static code snippets, I can comfortably drop working, client-side demos (from WebGPU neural models to WebAssembly pipelines) directly into the page.
+
+---
+
 ## The Real-World Test: A Clinic Website
 
 A personal tech blog is one thing—we tolerate tinkering and rough edges on our own sites. A real commercial business is another.
@@ -72,70 +139,3 @@ On traditional site builders like Squarespace or Wix, whenever you want to intro
 A prime example is **"Chat with Mila"**—a custom on-site interactive assistant that helps patients explore aesthetic treatments and answers common questions before booking.
 
 Building that directly in standard web code with an AI agent felt completely natural. No workarounds, no fighting proprietary platform limitations, and no compromising on the user experience—just clean, custom functionality that fits seamlessly into the site.
-
----
-
-## Why Wix, Squarespace, and Framer Are Falling Behind
-
-For years, whenever someone needed a website quickly, the standard advice was: *"Just use Wix, Squarespace, or Framer."*
-
-I tried. I really tried to use them.
-
-Even for experienced programmers who can write code with their eyes closed, those platforms added a massive overhead of learning their proprietary visual builders, quirky UI widgets, and locked-in ecosystems. You spent hours clicking around unfamiliar menus, fighting responsive breakpoints inside a visual canvas, and ending up with bloated, slow-loading pages.
-
-And while these platforms are scrambling to adapt to the AI age—bolting on "AI site builders" and copilot sidebars inside their visual editors—they're doing an awful job at it. 
-
-> <span class="quote-highlight text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white not-italic block my-1" data-quote-id="traditional-site-builders-dead">“Traditional site builders are failing to adapt to the AI era. They are practically dead; they just don't know it yet.”</span>
-
-Visual site builders were always an intermediate compromise: an awkward visual layer invented because non-programmers couldn't write code, and programmers didn't have the time to build everything from scratch. 
-
-Now that an AI agent can write, refactor, and deploy standard, pristine web code—HTML, CSS, TypeScript, Astro, and Tailwind—the entire premise of a proprietary visual canvas collapses. You get total control, instant page loads, zero vendor lock-in, and zero subscription tax. You don't need a visual builder anymore. You just need an agent and the open web.
-
----
-
-## The AI Engine: Gemini 3.8 Flash on Medium Effort
-
-There is a common misconception that using AI in software engineering requires defaulting to the largest, slowest models available.
-
-For development, I rely heavily on **Gemini Antigravity**, specifically running **Gemini 3.8 Flash with Medium thinking effort**.
-
-I’ve found 3.8 Flash on Medium effort to hit the ultimate sweet spot:
-* **Speed:** Instant responsiveness without long delays.
-* **Reasoning:** Thorough enough to refactor code, catch subtle edge cases, and run multi-step workspace tasks cleanly.
-* **Token & Cost Efficiency:** Incredibly lightweight, letting me iterate through dozens of diffs in a single sitting without hitting rate limits or high bills.
-
-Because the tool friction is gone, the editorial quality actually goes *up*:
-1. **Focus on substance over maintenance:** I spend my energy thinking through the thesis, not debugging CSS layout bugs or configuring build pipelines.
-2. **Timely publishing cadence:** When an interesting tech debate happens, I can publish a thoughtful take while the conversation is still relevant.
-3. **Overcoming the language tax:** English is not my first language. In the past, writing technical articles in English always carried an extra cognitive tax. I knew the engineering concepts inside out, but I’d spend energy second-guessing phrasing, grammar, or whether an idiom sounded natural. Gemini acts like an in-house technical editor: it polishes the English and tightens the flow while keeping my authentic voice and technical arguments intact.
-4. **Live, working examples:** Instead of just pasting static code snippets, I can comfortably drop working, client-side demos (from WebGPU neural models to WebAssembly pipelines) directly into the page.
-
----
-
-## The Infrastructure: Why DevOps Was a Failed Promise (Until Now)
-
-Writing website code was never the hard part for me. 
-
-The real bottlenecks were always two things: **Design** and **Deployments**.
-
-Design could sometimes be solved by outsourcing to Fiverr. But deployments had no clean solution. Even the modern wave of "Docker-to-cloud" platforms was a partial fix at best—they just shifted the operational headache from bare-metal servers to container orchestration and YAML soup.
-
-In fact:
-
-> <span class="quote-highlight text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white not-italic block my-1" data-quote-id="devops-unfulfilled-promise">“DevOps was an unfulfilled promise for a decade—we traded server management for YAML soup and ClickOps. AI is the missing piece that finally makes continuous delivery effortless.”</span>
-
-We preached "Infrastructure as Code" and continuous delivery, but in reality, most developers still defaulted to **ClickOps**—manually clicking around five different cloud dashboards—because writing, debugging, and maintaining deployment automations took longer than just clicking the buttons ourselves.
-
-**AI is the missing piece that makes DevOps finally work.**
-
-Now, DevOps feels like the natural way to build. I’m actually motivated to go the extra mile, generate a scoped Cloudflare API token, and hand it to my agent. Why? Because it’s **actually faster**.
-
-Instead of me spending three hours debugging CI scripts and webhook configs, I give the agent the API token, and it handles the entire loop:
-* **Cloudflare Pages & Functions:** Static site generation at the edge with instant serverless API endpoints.
-* **Cloudflare D1:** A fast, serverless relational SQL database (SQLite) that is infinitely easier to manage than document stores.
-* **Cloudflare R2:** S3-compatible object storage with zero egress fees.
-* **DNS & Domain Management:** Built-in SSL, DDoS protection, and edge caching out of the box.
-
-Best of all: **the free tier is extraordinarily generous**, and the entire platform can be managed through clean APIs using a single scoped token.
-
-When your AI coding environment can manipulate your entire cloud infrastructure through a clean API token in seconds, the friction of deployment completely vanishes.
