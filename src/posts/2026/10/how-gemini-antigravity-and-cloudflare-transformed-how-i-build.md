@@ -83,9 +83,9 @@ I tried. I really tried to use them.
 
 Even for experienced programmers who can write code with their eyes closed, those platforms added a massive overhead of learning their proprietary visual builders, quirky UI widgets, and locked-in ecosystems. You spent hours clicking around unfamiliar menus, fighting responsive breakpoints inside a visual canvas, and ending up with bloated, slow-loading pages.
 
-And while these platforms are now scrambling to adapt to the AI age—bolting on "AI site builders" and copilot sidebars inside their visual editors—they're doing an awful job at it. 
+And while these platforms are now scrambling to adapt to the AI age—bolting on "AI site builders" and copilot sidebars inside their visual editors—they're doing an awful job at it. I honestly expect them to fail.
 
-I honestly expect them to fail. **They are dead; they just don't know it yet.**
+> <span class="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white not-italic block my-1">"They are dead. They just don't know it yet."</span>
 
 Visual site builders were always an intermediate compromise: an awkward visual layer invented because non-programmers couldn't write code, and programmers didn't have the time to build everything from scratch. 
 
