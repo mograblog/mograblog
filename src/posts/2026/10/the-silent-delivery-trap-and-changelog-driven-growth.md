@@ -9,7 +9,7 @@ coverTitle: Koala engineer on a lift beside a giant highway billboard announcing
 
 I was reading Richard Rumelt’s classic book, ***Good Strategy/Bad Strategy: The Difference and Why It Matters***, and a passage in Chapter 15 (*Putting It Together*) immediately stopped me in my tracks:
 
-> *"Compared to a competitor working on an eighteen-month cycle, Nvidia’s six-month cycle would mean that its chip would be the better product about 83 percent of the time. <strong class="underline decoration-sky-500/70 decoration-2 underline-offset-4 font-bold text-neutral-900 dark:text-white">Plus, there is the constant buzz surrounding new product introductions, a substitute for expensive advertising.</strong>"*
+> <span class="quote-highlight text-base sm:text-lg text-neutral-800 dark:text-neutral-200 block not-italic" data-quote-id="nvidia-buzz-advertising">“Compared to a competitor working on an eighteen-month cycle, Nvidia’s six-month cycle would mean that its chip would be the better product about 83 percent of the time. <strong class="underline decoration-sky-500/70 decoration-2 underline-offset-4 font-bold text-neutral-900 dark:text-white">Plus, there is the constant buzz surrounding new product introductions, a substitute for expensive advertising.</strong>”</span>
 >
 > — *(Featured in my [Book Quotes collection](/quotes))*
 
@@ -83,7 +83,7 @@ This is where **Changelog-Led Growth** completes the picture:
 * **PLG is the product's state at a single point in time, *P(t)*:** It asks, *"Does this solve my immediate problem right now?"*
 * **Changelog-Led Growth is the first derivative, *dP/dt* (velocity):** It asks, *"At what speed is this team improving?"*
 
-> <strong class="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white not-italic block">“In developer tools and B2B SaaS, buyers don't just purchase what your software does on day one; <span class="underline decoration-sky-500/70 decoration-2 underline-offset-4">they are taking a bet on where it will be in six months.</span>”</strong>
+> <span class="quote-highlight text-lg sm:text-xl font-bold text-neutral-900 dark:text-white not-italic block" data-quote-id="bet-on-six-months">“In developer tools and B2B SaaS, buyers don't just purchase what your software does on day one; <span class="underline decoration-sky-500/70 decoration-2 underline-offset-4">they are taking a bet on where it will be in six months.</span>”</span>
 
 A transparent, high-cadence changelog gives dormant users a genuine reason to re-engage, builds immense trust that bugs get squashed in days rather than quarters, and turns early adopters into passionate evangelists.
 

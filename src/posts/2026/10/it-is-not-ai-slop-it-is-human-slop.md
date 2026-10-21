@@ -9,8 +9,7 @@ coverTitle: Senior koala engineer wearing a 'Just Approve It / human slop' shirt
 
 I recently came across this [post on X by Patrick Kuhnke](https://x.com/patrick_kuhnke_/status/2111825796872732921):
 
-> *"vibe coding is the new low-code.*  
-> *good luck to whoever has to maintain it in five years."*
+> <span class="quote-highlight text-lg sm:text-xl font-medium text-neutral-800 dark:text-neutral-200 block not-italic" data-quote-id="vibe-coding-low-code">“vibe coding is the new low-code.<br/>good luck to whoever has to maintain it in five years.”</span>
 
 Every developer seems to be nodding along right now, blaming "AI slop" for ruining codebases.
 
@@ -34,7 +33,7 @@ Huge, unreadable PRs have always been rubber-stamped. AI just made generating th
 
 When someone prompts an agent, glances at the output, and their peer clicks "Approve" without reading it—that is not an AI failure. 
 
-**AI generated the code. A human clicked "Merge."**
+> <span class="quote-highlight text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white block not-italic" data-quote-id="ai-generated-human-merged">“AI generated the code. A human clicked Merge.”</span>
 
 ---
 
