@@ -1,12 +1,15 @@
 ---
+import ShareBar from './ShareBar.astro';
+
 interface Props {
   quote?: string;
   author?: string;
   id?: string;
+  slug?: string;
   class?: string;
 }
 
-const { quote, author, id, class: className = '' } = Astro.props;
+const { quote, author, id, slug = '', class: className = '' } = Astro.props;
 ---
 
 <blockquote class={`quote-highlight-card ${className}`} id={id ? `quote-${id}` : undefined}>
@@ -18,4 +21,21 @@ const { quote, author, id, class: className = '' } = Astro.props;
       — {author}
     </cite>
   )}
+  <div class="quote-share-toolbar not-prose mt-4 pt-3 border-t border-neutral-200/60 dark:border-neutral-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
+    <div class="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400 font-medium">
+      <svg class="w-3.5 h-3.5 text-sky-500 dark:text-sky-400" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+      </svg>
+      <span class="text-[11px] uppercase tracking-wider font-semibold text-neutral-400 dark:text-neutral-500">Highlight</span>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <span class="text-[11px] text-neutral-400 mr-1 hidden sm:inline">Share quote:</span>
+      <ShareBar
+        title={quote || ''}
+        slug={id ? `${slug}#quote-${id}` : slug}
+        variant="compact"
+        quote={quote}
+      />
+    </div>
+  </div>
 </blockquote>

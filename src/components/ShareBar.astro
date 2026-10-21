@@ -2,32 +2,46 @@
 interface Props {
   title: string;
   slug: string;
-  variant?: 'inline' | 'icons';
+  quote?: string;
+  variant?: 'inline' | 'icons' | 'compact';
+  customUrl?: string;
 }
 
-const { title, slug, variant = 'icons' } = Astro.props;
+const { title, slug, quote = '', variant = 'icons', customUrl = '' } = Astro.props;
 const siteUrl = 'https://mograblog.com';
-const postUrl = `${siteUrl}/${slug.replace(/^\//, '')}`;
+const postUrl = customUrl || (slug ? `${siteUrl}/${slug.replace(/^\//, '')}` : siteUrl);
 const encodedUrl = encodeURIComponent(postUrl);
-const encodedTitle = encodeURIComponent(`${title} | Mograblog`);
+const shareText = quote ? `“${quote}”` : `${title} | Mograblog`;
+const encodedTitle = encodeURIComponent(shareText);
 
 const twitterUrl = `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`;
 const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
 const whatsAppUrl = `https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`;
 const redditUrl = `https://www.reddit.com/submit?url=${encodedUrl}&title=${encodedTitle}`;
+
+const isCompact = variant === 'compact';
+const btnClass = isCompact
+  ? 'w-7 h-7 rounded-lg flex items-center justify-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800/80 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 transition-all hover:scale-105 active:scale-95 shadow-xs cursor-pointer'
+  : 'w-8 h-8 rounded-xl flex items-center justify-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 transition-all hover:scale-105 active:scale-95 shadow-sm cursor-pointer';
+
+const copyBtnClass = isCompact
+  ? 'btn-copy-post-link w-7 h-7 rounded-lg flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 transition-all hover:scale-105 active:scale-95 shadow-xs cursor-pointer relative group'
+  : 'btn-copy-post-link w-8 h-8 rounded-xl flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 transition-all hover:scale-105 active:scale-95 shadow-sm cursor-pointer relative group';
+
+const iconClass = isCompact ? 'w-3 h-3' : 'w-3.5 h-3.5';
 ---
 
-<div class="flex items-center gap-1.5">
+<div class="share-bar-container flex items-center gap-1.5" data-quote={quote}>
   <!-- X / Twitter -->
   <a
     href={twitterUrl}
     target="_blank"
     rel="noopener noreferrer"
-    class="w-8 h-8 rounded-xl flex items-center justify-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-all hover:scale-105 active:scale-95 shadow-sm"
-    title="Share on X (Twitter)"
+    class={`share-btn-twitter ${btnClass} hover:text-neutral-900 dark:hover:text-white`}
+    title={quote ? "Share quote on X (Twitter)" : "Share on X (Twitter)"}
     aria-label="Share on X"
   >
-    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+    <svg class={iconClass} viewBox="0 0 24 24" fill="currentColor">
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
     </svg>
   </a>
@@ -37,11 +51,12 @@ const redditUrl = `https://www.reddit.com/submit?url=${encodedUrl}&title=${encod
     href={linkedInUrl}
     target="_blank"
     rel="noopener noreferrer"
-    class="w-8 h-8 rounded-xl flex items-center justify-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 hover:text-[#0A66C2] dark:hover:text-[#70B5F9] transition-all hover:scale-105 active:scale-95 shadow-sm"
-    title="Share on LinkedIn"
+    class={`share-btn-linkedin ${btnClass} hover:text-[#0A66C2] dark:hover:text-[#70B5F9]`}
+    title={quote ? "Share quote on LinkedIn (copies quote)" : "Share on LinkedIn"}
     aria-label="Share on LinkedIn"
+    data-quote={quote}
   >
-    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+    <svg class={iconClass} viewBox="0 0 24 24" fill="currentColor">
       <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.45c-.89 0-1.61.72-1.61 1.61 0 .88.72 1.6 1.61 1.6.89 0 1.61-.72 1.61-1.6 0-.89-.72-1.61-1.61-1.61z"/>
     </svg>
   </a>
@@ -51,11 +66,11 @@ const redditUrl = `https://www.reddit.com/submit?url=${encodedUrl}&title=${encod
     href={whatsAppUrl}
     target="_blank"
     rel="noopener noreferrer"
-    class="w-8 h-8 rounded-xl flex items-center justify-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 hover:text-[#25D366] transition-all hover:scale-105 active:scale-95 shadow-sm"
-    title="Share on WhatsApp"
+    class={`share-btn-whatsapp ${btnClass} hover:text-[#25D366]`}
+    title={quote ? "Share quote on WhatsApp" : "Share on WhatsApp"}
     aria-label="Share on WhatsApp"
   >
-    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+    <svg class={iconClass} viewBox="0 0 24 24" fill="currentColor">
       <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.196 8.196 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.12.17 1.78 2.71 4.3 3.8 2.53 1.09 2.53.73 2.99.69.45-.04 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.29z"/>
     </svg>
   </a>
@@ -65,27 +80,28 @@ const redditUrl = `https://www.reddit.com/submit?url=${encodedUrl}&title=${encod
     href={redditUrl}
     target="_blank"
     rel="noopener noreferrer"
-    class="w-8 h-8 rounded-xl flex items-center justify-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 hover:text-[#FF4500] transition-all hover:scale-105 active:scale-95 shadow-sm"
-    title="Share on Reddit"
+    class={`share-btn-reddit ${btnClass} hover:text-[#FF4500]`}
+    title={quote ? "Share quote on Reddit" : "Share on Reddit"}
     aria-label="Share on Reddit"
   >
-    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+    <svg class={iconClass} viewBox="0 0 24 24" fill="currentColor">
       <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.56 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.703zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.688-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
     </svg>
   </a>
 
-  <!-- Copy Link Button -->
+  <!-- Copy Link / Quote Button -->
   <button
     type="button"
-    class="btn-copy-post-link w-8 h-8 rounded-xl flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 transition-all hover:scale-105 active:scale-95 shadow-sm cursor-pointer relative group"
+    class={copyBtnClass}
     data-url={postUrl}
-    title="Copy link to clipboard"
+    data-quote={quote}
+    title={quote ? "Copy quote and link" : "Copy link to clipboard"}
     aria-label="Copy link"
   >
-    <svg class="w-3.5 h-3.5 copy-icon-default" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class={`${iconClass} copy-icon-default`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
     </svg>
-    <svg class="w-3.5 h-3.5 copy-icon-success hidden text-emerald-400 dark:text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class={`${iconClass} copy-icon-success hidden text-emerald-400 dark:text-emerald-600`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
     </svg>
     <span class="copy-toast absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-md whitespace-nowrap opacity-0 pointer-events-none transition-opacity duration-200">
@@ -95,12 +111,18 @@ const redditUrl = `https://www.reddit.com/submit?url=${encodedUrl}&title=${encod
 </div>
 
 <script>
-  function setupCopyLinkButtons() {
+  function setupShareBarInteractions() {
+    // Copy button handling (handles both standard links and quote text)
     document.querySelectorAll('.btn-copy-post-link').forEach((btn) => {
+      if (btn.hasAttribute('data-copy-initialized')) return;
+      btn.setAttribute('data-copy-initialized', 'true');
+
       btn.addEventListener('click', async () => {
         const url = btn.getAttribute('data-url') || window.location.href;
+        const quote = btn.getAttribute('data-quote');
+        const textToCopy = quote ? `“${quote}”\n\n${url}` : url;
         try {
-          await navigator.clipboard.writeText(url);
+          await navigator.clipboard.writeText(textToCopy);
           const iconDefault = btn.querySelector('.copy-icon-default');
           const iconSuccess = btn.querySelector('.copy-icon-success');
           const toast = btn.querySelector('.copy-toast');
@@ -117,12 +139,29 @@ const redditUrl = `https://www.reddit.com/submit?url=${encodedUrl}&title=${encod
             toast?.classList.remove('opacity-100');
           }, 2000);
         } catch (e) {
-          console.warn('Could not copy link:', e);
+          console.warn('Could not copy to clipboard:', e);
+        }
+      });
+    });
+
+    // LinkedIn button handling (copies quote to clipboard if present, so user can easily paste)
+    document.querySelectorAll('.share-btn-linkedin').forEach((btn) => {
+      if (btn.hasAttribute('data-linkedin-initialized')) return;
+      btn.setAttribute('data-linkedin-initialized', 'true');
+
+      btn.addEventListener('click', async () => {
+        const quote = btn.getAttribute('data-quote');
+        const url = (btn as HTMLAnchorElement).href;
+        if (quote) {
+          try {
+            await navigator.clipboard.writeText(`“${quote}”`);
+          } catch (e) {}
         }
       });
     });
   }
 
-  setupCopyLinkButtons();
-  document.addEventListener('astro:after-swap', setupCopyLinkButtons);
+  setupShareBarInteractions();
+  document.addEventListener('astro:after-swap', setupShareBarInteractions);
+  document.addEventListener('content:revealed', setupShareBarInteractions);
 </script>
