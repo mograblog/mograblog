@@ -64,10 +64,14 @@ When I asked the AI how to get better visibility into user drop-offs without slo
 
 The result was unbelievable: session recordings immediately highlighted unexpected friction points where real visitors were getting stuck on mobile navigation. We diagnosed and fixed those blockers the exact same day.
 
-### Unlocking Features That Squarespace Never Could
-Beyond small tweaks, the AI allowed me to build features that would have been practically impossible on Squarespace or Wix without expensive third-party plugins. 
+### Building Without Fighting the Platform
+Beyond visual tweaks, the real unlock was building custom interactive features without feeling like the platform was working against me.
 
-A prime example is **"Chat with Mila"**—a custom on-site interactive assistant that helps patients explore aesthetic treatments and answers common questions before booking. The AI handles cross-website design changes in minutes while preserving visual consistency, generates bespoke imagery when needed, and eliminates the fear of breaking production.
+On traditional site builders like Squarespace or Wix, whenever you want to introduce custom interactive logic, you constantly struggle with limitations. You find yourself hacking around awkward iframe embeds, fighting script restrictions, or compromising on UX because the platform’s constraints box you in.
+
+A prime example is **"Chat with Mila"**—a custom on-site interactive assistant that helps patients explore aesthetic treatments and answers common questions before booking.
+
+Building that directly in standard web code with an AI agent felt completely natural. No workarounds, no fighting proprietary platform limitations, and no compromising on the user experience—just clean, custom functionality that fits seamlessly into the site.
 
 ---
 
