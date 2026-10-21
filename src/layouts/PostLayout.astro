@@ -556,5 +556,10 @@ const blogPostingSchema = {
       setupMermaidDiagrams();
       setupHighlightQuotes();
     });
+    document.addEventListener('content:revealed', () => {
+      setupCodeBlocks();
+      setupMermaidDiagrams();
+      setupHighlightQuotes();
+    });
   </script>
 </BaseLayout>

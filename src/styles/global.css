@@ -265,6 +265,14 @@
     linear-gradient(-45deg, transparent 75%, #334155 75%);
 }
 
+/* Remove Tailwind typography default pseudo-quotes on blockquotes */
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after,
+.prose blockquote::before,
+.prose blockquote::after {
+  content: none !important;
+}
+
 /* ==========================================================================
    Editorial Quote Highlights with Share Actions
    ========================================================================== */
