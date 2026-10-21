@@ -1,0 +1,129 @@
+---
+interface HeadingItem {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: HeadingItem[];
+}
+
+const { headings = [] } = Astro.props;
+
+// Only include h2 and h3
+const tocItems = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{tocItems.length > 0 && (
+  <>
+    <!-- Mobile / Tablet Inline Collapsible TOC -->
+    <details class="xl:hidden my-8 p-4 rounded-2xl bg-neutral-50/80 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 text-sm group">
+      <summary class="font-semibold text-neutral-800 dark:text-neutral-200 cursor-pointer list-none flex items-center justify-between select-none">
+        <span class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+          </svg>
+          <span>Table of Contents</span>
+        </span>
+        <span class="text-xs text-neutral-400 group-open:rotate-180 transition-transform">▼</span>
+      </summary>
+      <nav class="mt-4 pt-3 border-t border-neutral-200 dark:border-neutral-800/80 space-y-1.5">
+        {tocItems.map((item) => (
+          <a
+            href={`#${item.slug}`}
+            class={`block text-xs py-1 transition-colors hover:text-sky-600 dark:hover:text-sky-400 ${
+              item.depth === 3
+                ? 'pl-4 text-neutral-500 dark:text-neutral-400'
+                : 'font-medium text-neutral-700 dark:text-neutral-300'
+            }`}
+          >
+            {item.text}
+          </a>
+        ))}
+      </nav>
+    </details>
+
+    <!-- Desktop Floating Sticky TOC on the Right -->
+    <aside class="hidden xl:block w-56 absolute left-[calc(100%+2.5rem)] top-0 h-full pointer-events-auto">
+      <div class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2">
+        <div class="text-[12px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-3 flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+          </svg>
+          <span>Contents</span>
+        </div>
+
+        <nav id="desktop-toc-nav" class="space-y-1 text-xs border-l border-neutral-200 dark:border-neutral-800">
+          {tocItems.map((item) => (
+            <a
+              href={`#${item.slug}`}
+              data-toc-link={item.slug}
+              class={`block py-1 pl-3.5 -ml-px border-l-2 border-transparent transition-all hover:text-sky-600 dark:hover:text-sky-400 ${
+                item.depth === 3
+                  ? 'pl-6 text-[11px] text-neutral-500 dark:text-neutral-400'
+                  : 'font-medium text-neutral-600 dark:text-neutral-300'
+              }`}
+            >
+              {item.text}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Scroll Spy Script to highlight active heading -->
+    <script>
+      function initTocScrollSpy() {
+        const links = document.querySelectorAll('#desktop-toc-nav a[data-toc-link]');
+        if (!links.length) return;
+
+        const headingElements: HTMLElement[] = [];
+        links.forEach((link) => {
+          const slug = link.getAttribute('data-toc-link');
+          if (slug) {
+            const el = document.getElementById(slug);
+            if (el) headingElements.push(el);
+          }
+        });
+
+        if (!headingElements.length) return;
+
+        let activeSlug = '';
+
+        function onScroll() {
+          const scrollPosition = window.scrollY + 140;
+          let currentHeading = headingElements[0];
+
+          for (const heading of headingElements) {
+            if (heading.offsetTop <= scrollPosition) {
+              currentHeading = heading;
+            } else {
+              break;
+            }
+          }
+
+          if (currentHeading && currentHeading.id !== activeSlug) {
+            activeSlug = currentHeading.id;
+            links.forEach((link) => {
+              const slug = link.getAttribute('data-toc-link');
+              if (slug === activeSlug) {
+                link.classList.add('text-sky-600', 'dark:text-sky-400', 'border-sky-600', 'dark:border-sky-400', 'font-semibold');
+                link.classList.remove('border-transparent');
+              } else {
+                link.classList.remove('text-sky-600', 'dark:text-sky-400', 'border-sky-600', 'dark:border-sky-400', 'font-semibold');
+                link.classList.add('border-transparent');
+              }
+            });
+          }
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      }
+
+      initTocScrollSpy();
+      document.addEventListener('astro:page-load', initTocScrollSpy);
+    </script>
+  </>
+)}

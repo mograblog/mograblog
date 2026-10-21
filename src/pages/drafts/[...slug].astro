@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
 ---
 
 <PostLayout
@@ -27,6 +27,8 @@ const { Content } = await render(entry);
   cover={entry.data.cover}
   coverTitle={entry.data.coverTitle}
   draft={true}
+  toc={entry.data.toc}
+  headings={headings}
 >
   <!-- Gated Admin Preview Screen -->
   <div id="draft-auth-lock" class="my-12 p-8 max-w-md mx-auto rounded-3xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/60 dark:bg-amber-950/30 backdrop-blur shadow-xl text-center space-y-5">

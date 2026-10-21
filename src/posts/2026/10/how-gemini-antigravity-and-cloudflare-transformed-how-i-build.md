@@ -6,6 +6,7 @@ keywords: braindump, ai, gemini antigravity, cloudflare, astro, fullstack, softw
 cover: /koalas/gemini-cloudflare-koala.jpg
 coverTitle: Senior koala engineer pairing Gemini Antigravity with Cloudflare to ship blazing fast fullstack websites
 draft: true
+toc: true
 ---
 
 *An honest braindump on how Gemini Antigravity, Cloudflare, and shipping real projects changed my relationship with building software.*

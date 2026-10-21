@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import CommentsSection from '../components/CommentsSection.astro';
 import LiveReadingSidebar from '../components/LiveReadingSidebar.astro';
+import TableOfContents from '../components/TableOfContents.astro';
 import FeedbackModal from '../components/FeedbackModal.astro';
 import ClapButton from '../components/ClapButton.astro';
 import ShareBar from '../components/ShareBar.astro';
@@ -19,6 +20,8 @@ interface Props {
   cover?: string;
   coverTitle?: string;
   draft?: boolean;
+  toc?: boolean;
+  headings?: Array<{ depth: number; slug: string; text: string }>;
   prevPost?: { title: string; url: string };
   nextPost?: { title: string; url: string };
 }
@@ -32,6 +35,8 @@ const {
   cover,
   coverTitle,
   draft = false,
+  toc = false,
+  headings = [],
   prevPost,
   nextPost,
 } = Astro.props;
@@ -66,7 +71,7 @@ const blogPostingSchema = {
   description={description}
   keywords={keywords}
   image={cover}
-  containerClass="max-w-6xl"
+  containerClass={toc ? 'max-w-7xl' : 'max-w-6xl'}
   type="article"
   publishedTime={publishedIso}
   noindex={draft}
@@ -75,6 +80,9 @@ const blogPostingSchema = {
   <div class="relative max-w-3xl mx-auto">
     <!-- Left Sidebar: Visitors are also reading... -->
     <LiveReadingSidebar slug={slug} title={title} />
+
+    <!-- Right Sidebar: Floating Table of Contents (if enabled) -->
+    {toc && <TableOfContents headings={headings} />}
 
     <!-- Main Article Body -->
     <article class="w-full">
