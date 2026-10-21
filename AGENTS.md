@@ -29,6 +29,16 @@
 
 ---
 
+## 🧩 Component-First Engineering (Default Standard)
+
+1. **Components by Default:**
+   - Whenever designing, styling, or adding a new visual pattern, UI element, or interactive feature (e.g., quote highlights, share toolbars, callouts, cards, badges, embed players), **ALWAYS implement it as a reusable component or centralized layout enhancement by default**.
+   - **Never hardcode ad-hoc UI structures, inline script snippets, or custom styling into individual Markdown posts or page templates.**
+   - All markup structure, styling, and interactive behaviors must live centrally in `src/components/`, `src/layouts/`, or `src/styles/`. Updating the component in one place must immediately and cleanly propagate across all past and future posts.
+   - For standard Markdown (`.md`), provide a clean, semantic hook (such as a standard CSS class like `.quote-highlight` or HTML element), and let the layout/component manage all behavior and UI chrome automatically.
+
+---
+
 ## 📢 Post-Publication Distribution Checklist
 
 Whenever a new blog post is published and deployed, **ALWAYS** remind the user to distribute it, run `npm run share [slug]`, and provide pre-formatted, clickable 1-click submission links and titles for the following platforms:
