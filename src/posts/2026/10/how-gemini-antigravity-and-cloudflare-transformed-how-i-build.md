@@ -79,13 +79,17 @@ Building that directly in standard web code with an AI agent felt completely nat
 
 For years, whenever someone needed a website quickly, the standard advice was: *"Just use Wix, Squarespace, or Framer."*
 
-I always hated that compromise.
+I tried. I really tried to use them.
 
 Even for experienced programmers who can write code with their eyes closed, those platforms added a massive overhead of learning their proprietary visual builders, quirky UI widgets, and locked-in ecosystems. You spent hours clicking around unfamiliar menus, fighting responsive breakpoints inside a visual canvas, and ending up with bloated, slow-loading pages.
 
-With an AI agent, **you don't need a visual builder.**
+And while these platforms are now scrambling to adapt to the AI age—bolting on "AI site builders" and copilot sidebars inside their visual editors—they're doing an awful job at it. 
 
-AI works directly with standard, clean web technologies—HTML, CSS, TypeScript, Astro, and Tailwind. You get total control, instant load times, zero vendor lock-in, and zero learning curve for proprietary platforms.
+I honestly expect them to fail. **They are dead; they just don't know it yet.**
+
+Visual site builders were always an intermediate compromise: an awkward visual layer invented because non-programmers couldn't write code, and programmers didn't have the time to build everything from scratch. 
+
+Now that an AI agent can write, refactor, and deploy standard, pristine web code—HTML, CSS, TypeScript, Astro, and Tailwind—the entire premise of a proprietary visual canvas collapses. You get total control, instant page loads, zero vendor lock-in, and zero subscription tax. You don't need a visual builder anymore. You just need an agent and the open web.
 
 ---
 
