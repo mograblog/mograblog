@@ -7,21 +7,125 @@ interface Props {
 const { slug, title } = Astro.props;
 ---
 
+<!-- Instant check to prevent layout flash before hydration -->
+<script is:inline>
+  try {
+    if (localStorage.getItem('mograblog_live_reading_collapsed') === 'true') {
+      document.documentElement.classList.add('live-reading-collapsed');
+    } else {
+      document.documentElement.classList.remove('live-reading-collapsed');
+    }
+  } catch (e) {}
+</script>
+
+<style is:global>
+  html.live-reading-collapsed #live-reading-collapsed-view {
+    display: flex !important;
+  }
+  html.live-reading-collapsed #live-reading-expanded-view {
+    display: none !important;
+  }
+</style>
+
 <aside id="live-reading-sidebar" class="hidden xl:block w-52 absolute right-[calc(100%+2.5rem)] top-0 h-full pointer-events-auto" data-slug={slug} data-title={title}>
-  <div class="sticky top-24 space-y-4">
-    <div class="text-[12px] font-medium text-neutral-500 dark:text-neutral-400 tracking-tight">
-      Visitors are also reading...
+  <div class="sticky top-24">
+    <!-- Collapsed View (Pill aligned neatly next to article margin) -->
+    <div id="live-reading-collapsed-view" class="hidden justify-end">
+      <button
+        id="live-reading-expand-btn"
+        type="button"
+        class="group inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white bg-white/90 dark:bg-neutral-900/90 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full border border-neutral-200/80 dark:border-neutral-800 shadow-sm backdrop-blur transition-all duration-150 cursor-pointer"
+        title="Show what visitors are reading"
+        aria-label="Expand 'Visitors are also reading' sidebar"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <svg class="w-3.5 h-3.5 text-sky-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        <span>Also reading</span>
+      </button>
     </div>
 
-    <div id="live-reading-items" class="space-y-3.5 text-xs">
-      <div class="text-neutral-400 animate-pulse text-[11px]">
-        Loading live activity...
+    <!-- Expanded View (Full card with close button) -->
+    <div id="live-reading-expanded-view" class="space-y-4">
+      <div class="flex items-center justify-between text-[12px] font-medium text-neutral-500 dark:text-neutral-400 tracking-tight">
+        <span class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Visitors are also reading...</span>
+        </span>
+        <button
+          id="live-reading-collapse-btn"
+          type="button"
+          class="p-1 -mr-1 text-neutral-400 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-200 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+          title="Close sidebar (we'll remember your choice)"
+          aria-label="Close 'Visitors are also reading' sidebar"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div id="live-reading-items" class="space-y-3.5 text-xs">
+        <div class="text-neutral-400 animate-pulse text-[11px]">
+          Loading live activity...
+        </div>
       </div>
     </div>
   </div>
 </aside>
 
 <script>
+  const STORAGE_KEY = 'mograblog_live_reading_collapsed';
+
+  function applyCollapsedState(collapsed: boolean) {
+    try {
+      if (collapsed) {
+        document.documentElement.classList.add('live-reading-collapsed');
+      } else {
+        document.documentElement.classList.remove('live-reading-collapsed');
+      }
+    } catch (e) {}
+
+    const collapsedView = document.getElementById('live-reading-collapsed-view');
+    const expandedView = document.getElementById('live-reading-expanded-view');
+    if (!collapsedView || !expandedView) return;
+
+    if (collapsed) {
+      collapsedView.classList.remove('hidden');
+      collapsedView.classList.add('flex');
+      expandedView.classList.add('hidden');
+    } else {
+      collapsedView.classList.add('hidden');
+      collapsedView.classList.remove('flex');
+      expandedView.classList.remove('hidden');
+    }
+  }
+
+  function setupToggleListeners() {
+    const collapseBtn = document.getElementById('live-reading-collapse-btn');
+    const expandBtn = document.getElementById('live-reading-expand-btn');
+
+    if (collapseBtn) {
+      collapseBtn.onclick = () => {
+        try {
+          localStorage.setItem(STORAGE_KEY, 'true');
+        } catch (e) {}
+        applyCollapsedState(true);
+      };
+    }
+
+    if (expandBtn) {
+      expandBtn.onclick = () => {
+        try {
+          localStorage.setItem(STORAGE_KEY, 'false');
+        } catch (e) {}
+        applyCollapsedState(false);
+      };
+    }
+  }
+
   function formatRelativeTime(dateStr: string) {
     if (!dateStr) return 'recently';
     const now = new Date().getTime();
@@ -77,6 +181,14 @@ const { slug, title } = Astro.props;
     const viewCounter = document.getElementById('view-count-number');
     const container = document.getElementById('live-reading-items');
     if (!sidebar) return;
+
+    // Apply persisted collapse state and attach toggle listeners
+    let isCollapsed = false;
+    try {
+      isCollapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+    } catch (e) {}
+    applyCollapsedState(isCollapsed);
+    setupToggleListeners();
 
     const slug = sidebar.getAttribute('data-slug') || '';
     const title = sidebar.getAttribute('data-title') || '';
