@@ -1,11 +1,15 @@
 ---
-title: "From 'Let's Make It Work' to 'Let's Build Something': Shipping Websites in the AI Era"
+title: "Braindump: From 'Let's Make It Work' to 'Let's Build Something'"
 published: 2026-10-21
-description: "How pairing Gemini Antigravity (Gemini 3.8 Flash on Medium effort) with Cloudflare eliminated site maintenance friction, accelerated content, and transformed both my blog and my wife's clinic website."
-keywords: ai, gemini antigravity, cloudflare, astro, fullstack, software engineering, developer productivity, gemini 3.8 flash, devops, clickops, microsoft clarity
+description: "An honest braindump on how pairing Gemini Antigravity (Gemini 3.8 Flash on Medium effort) with Cloudflare eliminated site maintenance friction, accelerated content, and transformed both my blog and my wife's clinic website."
+keywords: braindump, ai, gemini antigravity, cloudflare, astro, fullstack, software engineering, developer productivity, gemini 3.8 flash, devops, clickops, microsoft clarity
 cover: /koalas/gemini-cloudflare-koala.jpg
 coverTitle: Senior koala engineer pairing Gemini Antigravity with Cloudflare to ship blazing fast fullstack websites
 draft: true
+---
+
+*An honest braindump on how Gemini Antigravity, Cloudflare, and shipping real projects changed my relationship with building software.*
+
 ---
 
 Ever since I started Mograblog in 2010, the tagline under the title has been:  
