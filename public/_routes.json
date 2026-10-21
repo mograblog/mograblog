@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "include": [
+    "/*"
+  ],
+  "exclude": [
+    "/_astro/*",
+    "/apple-touch-icon.png",
+    "/favicon-16x16.png",
+    "/favicon-192x192.png",
+    "/favicon-32x32.png",
+    "/favicon-48x48.png",
+    "/favicon.ico",
+    "/favicon.png",
+    "/robots.txt",
+    "/header_images/*",
+    "/koalas/*",
+    "/images/*",
+    "/style/*",
+    "/rss.xml",
+    "/sitemap.xml"
+  ]
+}
