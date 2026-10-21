@@ -79,7 +79,7 @@ For me, the winning combination is **Gemini Antigravity** paired with **Cloudfla
 ### The Engine: Gemini 3.8 Flash on Medium Effort
 There is a common misconception that using AI in software engineering requires defaulting to the largest, slowest models available.
 
-For development, I rely heavily on **Gemini Antigravity**, specifically running **Gemini 3.8 Flash with Medium thinking effort**.
+For development, I rely heavily on **Gemini Antigravity** (which, let's be honest, is heavily subsidized right now 😉), specifically running **Gemini 3.8 Flash with Medium thinking effort**.
 
 I’ve found 3.8 Flash on Medium effort to hit the ultimate sweet spot:
 * **Speed:** Instant responsiveness without long delays.
@@ -117,7 +117,7 @@ My wife runs an aesthetic medical clinic, and her website ([www.milabeautyinject
 
 In the past, maintaining a family member's business website was something every software engineer quietly dreaded. Updating service lists, changing photo layouts, or fixing mobile navigation meant context-switching, local builds, and manual testing. You’d put off requests because the friction was annoying.
 
-With Gemini Antigravity and Cloudflare, **I don’t think twice before making a change.** Here are three real examples:
+With Gemini Antigravity and Cloudflare, **I don’t think twice before making a change.** Here are a few real examples:
 
 ### 1. Breaking the "Deer in the Headlights" Paralysis: The Awards Page
 Mila won an industry award at the beginning of the year. I had meant to showcase it on the site for months, but never found the time.
@@ -141,7 +141,7 @@ When I asked the AI how to get better visibility into user drop-offs without slo
 
 The result was unbelievable: session recordings immediately highlighted unexpected friction points where real visitors were getting stuck on mobile navigation. We diagnosed and fixed those blockers the exact same day.
 
-### 4. Custom Features: Chat with Mila
+### 4. Breaking Free from Platform Constraints: "Chat with Mila"
 Beyond visual tweaks, the real unlock was building custom interactive features without feeling like the platform was working against me.
 
 On traditional site builders like Squarespace or Wix, whenever you want to introduce custom interactive logic, you constantly struggle with limitations. You find yourself hacking around awkward iframe embeds, fighting script restrictions, or compromising on UX because the platform’s constraints box you in.
@@ -149,3 +149,13 @@ On traditional site builders like Squarespace or Wix, whenever you want to intro
 A prime example is **"Chat with Mila"**—a custom on-site interactive assistant that helps patients explore aesthetic treatments and answers common questions before booking.
 
 Building that directly in standard web code with an AI agent felt completely natural. No workarounds, no fighting proprietary platform limitations, and no compromising on the user experience—just clean, custom functionality that fits seamlessly into the site.
+
+---
+
+## Over to You
+
+For more than a decade, building on the web meant spending most of our creative energy surviving the plumbing. Today, with the right combination of an agentic coding partner and modern edge infrastructure, that tax has largely vanished.
+
+What has been your experience? Have you felt that shift from *"let's make it work"* to *"let's build something"*, or are you still wrestling with YAML configs and site builders? 
+
+Share your thoughts and experiences in the comments below—I'd love to hear how your workflow is evolving!
