@@ -1,36 +1,24 @@
 ---
-import { getCollection, render } from 'astro:content';
+export const prerender = false;
+
+import { getEntry, render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
 
-export async function getStaticPaths() {
-  const posts = await getCollection('posts');
-  
-  return posts.map((entry) => {
-    const cleanSlug = entry.id.replace(/\.md$/, '');
-    return {
-      params: { slug: cleanSlug },
-      props: { entry },
-    };
-  });
+const { slug } = Astro.params;
+const cleanSlug = (slug || '').replace(/^\/|\/$/g, '');
+
+const entry = await getEntry('posts', cleanSlug);
+if (!entry) {
+  return Astro.redirect('/', 302);
 }
 
-const { entry } = Astro.props;
-const cleanSlug = entry.id.replace(/\.md$/, '');
-
-// If the post has been published, permanently redirect to its canonical live URL!
+// If already published, redirect to canonical article
 if (!entry.data.draft) {
   return Astro.redirect(`/${cleanSlug}/`, 301);
 }
 
 const { Content, headings } = await render(entry);
 ---
-
-<!-- Instant client fast-fail: if not logged in, redirect directly to homepage -->
-<script is:inline>
-  if (typeof document !== 'undefined' && !document.cookie.includes('__session')) {
-    window.location.replace('/');
-  }
-</script>
 
 <PostLayout
   title={entry.data.title}
@@ -44,42 +32,15 @@ const { Content, headings } = await render(entry);
   toc={entry.data.toc}
   headings={headings}
 >
-  <!-- Authenticated Draft Content: Hidden by default until Admin is verified -->
-  <div id="draft-protected-content" class="hidden">
-    <div class="mb-8 p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 text-xs font-semibold flex items-center justify-between shadow-sm">
-      <div class="flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span>Authenticated Admin Preview</span>
-      </div>
-      <span class="font-mono text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-700">
-        draft: true
-      </span>
+  <div class="mb-8 p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 text-xs font-semibold flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span>Authenticated Admin Preview</span>
     </div>
-
-    <Content />
+    <span class="font-mono text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-700">
+      draft: true
+    </span>
   </div>
+
+  <Content />
 </PostLayout>
-
-<script>
-  import { initClerk, getClerkUser } from '../../lib/clerk';
-
-  const contentEl = document.getElementById('draft-protected-content');
-
-  async function checkAdmin() {
-    try {
-      const clerk = await initClerk();
-      const user = getClerkUser(clerk);
-      if (user && user.isAdmin) {
-        contentEl?.classList.remove('hidden');
-        document.dispatchEvent(new CustomEvent('content:revealed'));
-      } else {
-        // Not authorized or not admin: redirect immediately to homepage
-        window.location.replace('/');
-      }
-    } catch (e) {
-      window.location.replace('/');
-    }
-  }
-
-  checkAdmin();
-</script>
