@@ -122,7 +122,7 @@ Design could sometimes be solved by outsourcing to Fiverr. But deployments had n
 
 In fact:
 
-> <span class="quote-highlight text-xl md:text-2xl font-bold text-neutral-900 dark:text-white not-italic block my-1" data-quote-id="devops-failed-promise">“DevOps has felt like a failed promise for years.”</span>
+> <span class="quote-highlight text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white not-italic block my-1" data-quote-id="devops-unfulfilled-promise">“DevOps was an unfulfilled promise for a decade—we traded server management for YAML soup and ClickOps. AI is the missing piece that finally makes continuous delivery effortless.”</span>
 
 We preached "Infrastructure as Code" and continuous delivery, but in reality, most developers still defaulted to **ClickOps**—manually clicking around five different cloud dashboards—because writing, debugging, and maintaining deployment automations took longer than just clicking the buttons ourselves.
 
