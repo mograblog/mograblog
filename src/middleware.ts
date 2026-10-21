@@ -8,7 +8,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // 1. Check if session cookie exists
     const sessionCookie = context.cookies.get('__session')?.value;
     if (!sessionCookie) {
-      return context.redirect('/', 302);
+      return new Response(null, {
+        status: 302,
+        headers: { Location: '/' },
+      });
     }
 
     // 2. Check Clerk locals auth (if populated by @clerk/astro)
@@ -17,7 +20,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
       if (auth) {
         const { userId, sessionClaims } = auth;
         if (!userId) {
-          return context.redirect('/', 302);
+          return new Response(null, {
+            status: 302,
+            headers: { Location: '/' },
+          });
         }
 
         const adminEmail = (
@@ -40,12 +46,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
         );
 
         if (!isAdmin && (adminEmail || sessionClaims?.public_metadata)) {
-          return context.redirect('/', 302);
+          return new Response(null, {
+            status: 302,
+            headers: { Location: '/' },
+          });
         }
       }
     } catch (e) {
       // If auth check fails, redirect to homepage
-      return context.redirect('/', 302);
+      return new Response(null, {
+        status: 302,
+        headers: { Location: '/' },
+      });
     }
   }
 
